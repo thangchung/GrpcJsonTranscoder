@@ -4,10 +4,13 @@ option csharp_namespace = "GrpcShared";
 
 package Greet;
 
+import "google/api/annotations.proto";
+
 // The greeting service definition.
 service Greeter {
   // Sends a greeting
   rpc SayHello (HelloRequest) returns (HelloReply) {}
+  rpc SayHello123 (HelloRequest) returns (HelloReply) {}
 }
 
 // The request message containing the user's name.

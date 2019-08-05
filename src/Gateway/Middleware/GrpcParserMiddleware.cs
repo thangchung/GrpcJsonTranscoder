@@ -1,65 +1,21 @@
-using Gateway.Extensions;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Hosting;
+﻿using Google.Protobuf.Reflection;
+using GrpcShared;
 using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Ocelot.DependencyInjection;
-using Ocelot.Middleware;
-using System;
+using Microsoft.Extensions.Logging;
+using ProtoBuf;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace Gateway
+namespace Gateway.Middleware
 {
-    public class Startup
-    {
-        public Startup(IConfiguration configuration)
-        {
-            AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
-            Configuration = configuration;
-        }
-
-        public IConfiguration Configuration { get; }
-
-        public void ConfigureServices(IServiceCollection services)
-        {
-            services.AddOcelot();//.AddGrpcHttpGateway(Configuration);
-        }
-
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
-        {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
-            //app.UseMiddleware<ProxyMiddleware>();
-
-            //app.UseRouting();
-
-            /*app.UseEndpoints(endpoints =>
-            {
-                endpoints.MapGet("/", async context =>
-                {
-                    await context.Response.WriteAsync("Hello World!");
-                });
-            });*/
-
-            app.UseOcelot(config =>
-            {
-                config.AddGrpcHttpGateway();
-            }).Wait();
-        }
-    }
-
-    /*public class ProxyMiddleware
+    public class GrpcParserMiddleware
     {
         private readonly RequestDelegate _next;
-        private readonly ILogger<ProxyMiddleware> _logger;
+        private readonly ILogger<GrpcParserMiddleware> _logger;
 
-        public ProxyMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
+        public GrpcParserMiddleware(RequestDelegate next, ILoggerFactory loggerFactory)
         {
-            _logger = loggerFactory.CreateLogger<ProxyMiddleware>();
+            _logger = loggerFactory.CreateLogger<GrpcParserMiddleware>();
             _next = next;
         }
 
@@ -101,6 +57,8 @@ namespace Gateway
             }
 
             var aa = myServices;
+
+            await _next(httpContext);
         }
     }
 
@@ -115,5 +73,5 @@ namespace Gateway
         public string Name { get; set; }
         public string InputType { get; set; }
         public string OutputType { get; set; }
-    }*/
+    }
 }
