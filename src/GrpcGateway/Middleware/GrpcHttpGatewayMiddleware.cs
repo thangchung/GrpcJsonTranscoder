@@ -1,5 +1,6 @@
 ﻿using Google.Protobuf.Reflection;
 using Grpc.Core;
+using Grpc.Reflection.V1Alpha;
 using GrpcShared;
 using Ocelot.Logging;
 using Ocelot.Middleware;
@@ -12,6 +13,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using static Grpc.Reflection.V1Alpha.ServerReflection;
 
 namespace GrpcGateway.Middleware
 {
@@ -33,30 +35,32 @@ namespace GrpcGateway.Middleware
 
             var grpcClient = $"{host}:{port}";
 
-            var myServices = new List<MyServiceInfo>();
+            var myServices = new Dictionary<string, MyServiceInfo>();
 
             using (var stream = typeof(Greeter.GreeterClient).Assembly.GetManifestResourceStream("GrpcShared.greet.pb"))
             {
                 var fileDescriptorSet = Serializer.Deserialize<FileDescriptorSet>(stream);
                 var fileDescriptorProtos = fileDescriptorSet.Files.Where(f => f.Package == "Greet");
 
+                //new ServerReflectionRequest().
+
                 foreach (var fileDescriptorProto in fileDescriptorProtos)
                 {
-                    MyServiceInfo myService;
-
                     foreach (var service in fileDescriptorProto.Services)
                     {
-                        myService = new MyServiceInfo
-                        {
-                            Name = $"{fileDescriptorProto.Package}.{service.Name}",
-                            CSharpNameSpace = fileDescriptorProto.Options.CsharpNamespace,
-                            ServiceType = Type.GetType($"{fileDescriptorProto.Options.CsharpNamespace}.{service.Name}, {fileDescriptorProto.Options.CsharpNamespace}")
-                        };
-
-                        MyMethodInfo myMethod;
-
                         foreach (var method in service.Methods)
                         {
+                            MyServiceInfo myService;
+
+                            myService = new MyServiceInfo
+                            {
+                                Name = $"{fileDescriptorProto.Package}.{service.Name}",
+                                CSharpNameSpace = fileDescriptorProto.Options.CsharpNamespace,
+                                ServiceType = Type.GetType($"{fileDescriptorProto.Options.CsharpNamespace}.{service.Name}, {fileDescriptorProto.Options.CsharpNamespace}")
+                            };
+
+                            MyMethodInfo myMethod;
+
                             myMethod = new MyMethodInfo
                             {
                                 Name = method.Name,
@@ -65,17 +69,31 @@ namespace GrpcGateway.Middleware
                                 OutputType = Type.GetType($"{myService.CSharpNameSpace}.{method.OutputType.Split(".").Last()}, {myService.CSharpNameSpace}")
                             };
 
-                            myService.Methods.Add(myMethod);
+                           myService.Methods.Add(myMethod);
+                           myServices.Add($"/{myService.Name}/{method.Name}", myService);
                         }
-
-                        myServices.Add(myService);
                     }
                 }
 
+                var calledService = myServices.GetValueOrDefault(absolutePath);
+
                 var channel = new Channel(grpcClient, ChannelCredentials.Insecure);
-                /*var client = typeof(TService)
+                var client = new ServerReflectionClient(channel);
+                var response = await SingleRequestAsync(client, new ServerReflectionRequest
+                {
+                    ListServices = "" // Get all services
+                });
+
+                /*var client = calledService.ServiceType
                     .GetConstructor(new[] { typeof(Channel) })
-                    .Invoke(new object[] { channel });*/
+                    .Invoke(new object[] { channel });
+
+                client.GetType().InvokeMember(
+                    calledService.Methods[0].Name,
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod,
+                    null,
+                    client,
+                    new[] { new HelloRequest() });*/
             }
 
             OkResponse<GrpcHttpContent> httpResponse;
@@ -83,6 +101,15 @@ namespace GrpcGateway.Middleware
 
             context.HttpContext.Response.ContentType = "application/json";
             context.DownstreamResponse = new DownstreamResponse(httpResponse.Data, HttpStatusCode.OK, httpResponse.Data.Headers, "GrpcHttpGatewayMiddleware");
+        }
+
+        private static async Task<ServerReflectionResponse> SingleRequestAsync(ServerReflectionClient client, ServerReflectionRequest request)
+        {
+            var call = client.ServerReflectionInfo();
+            await call.RequestStream.WriteAsync(request);
+            var response = call.ResponseStream.Current;
+            await call.RequestStream.CompleteAsync();
+            return response;
         }
     }
 

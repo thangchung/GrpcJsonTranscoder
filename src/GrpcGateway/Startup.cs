@@ -23,11 +23,11 @@ namespace GrpcGateway
         public void ConfigureServices(IServiceCollection services)
         {
             //services.AddOcelot(Configuration);
-            services.Scan(s =>
+            /*services.Scan(s =>
                 s.FromCallingAssembly()
                     .AddClasses(c => c.AssignableTo(typeof(ClientBase<>)))
                     .AsImplementedInterfaces()
-                    .WithScopedLifetime());
+                    .WithScopedLifetime());*/
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
