@@ -11,6 +11,18 @@
       ],
       "UpstreamPathTemplate": "/",
       "UpstreamHttpMethod": [ "Get" ]
+    },
+    {
+      "DownstreamPathTemplate": "/Greet.Greeter/SayHello123",
+      "DownstreamScheme": "grpc",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "127.0.0.1",
+          "Port": 5001
+        }
+      ],
+      "UpstreamPathTemplate": "/{message}",
+      "UpstreamHttpMethod": [ "Get" ]
     }
   ]
 }

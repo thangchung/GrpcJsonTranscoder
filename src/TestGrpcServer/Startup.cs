@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,10 +18,9 @@ namespace TestGrpcServer
     {
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddGrpc();
+            services.AddGrpc(options => { options.EnableDetailedErrors = true; });
             services.TryAddSingleton(serviceProvider =>
             {
-                //var logger = serviceProvider.GetRequiredService<ILoggerFactory>().CreateLogger(nameof(Startup));
                 var endpointDataSource = serviceProvider.GetRequiredService<EndpointDataSource>();
 
                 var grpcEndpointMetadata = endpointDataSource.Endpoints

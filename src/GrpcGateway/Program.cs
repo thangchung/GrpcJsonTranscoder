@@ -32,7 +32,6 @@ namespace GrpcGateway
             {
                 logging.AddConsole();
             })
-            //.UseIISIntegration()
             .Configure(app =>
             {
                 app.UseOcelot(config =>
@@ -43,9 +42,5 @@ namespace GrpcGateway
             .Build()
             .Run();
         }
-
-        /*public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>();*/
     }
 }

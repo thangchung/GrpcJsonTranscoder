@@ -20,5 +20,13 @@ namespace TestGrpcServer
                 Message = "Hello " + request.Name
             });
         }
+
+        public override Task<HelloReply> SayHello123(HelloRequest request, ServerCallContext context)
+        {
+            return Task.FromResult(new HelloReply
+            {
+                Message = "Hello " + request.Name + "from 123"
+            }); ;
+        }
     }
 }

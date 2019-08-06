@@ -1,19 +1,19 @@
 ﻿using Google.Protobuf.Reflection;
 using Grpc.Core;
-using Grpc.Reflection.V1Alpha;
+using GrpcGateway.Grpc;
 using GrpcShared;
 using Ocelot.Logging;
 using Ocelot.Middleware;
 using Ocelot.Responses;
-using ProtoBuf;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
+using System.Reflection;
 using System.Threading.Tasks;
-using static Grpc.Reflection.V1Alpha.ServerReflection;
 
 namespace GrpcGateway.Middleware
 {
@@ -27,89 +27,46 @@ namespace GrpcGateway.Middleware
             _next = next;
         }
 
-        public async Task Invoke(DownstreamContext context, IServiceProvider serviceProvider)
+        public async Task Invoke(DownstreamContext context)
         {
-            var host = context.DownstreamRequest.Host;
-            var port = context.DownstreamRequest.Port;
             var absolutePath = context.DownstreamRequest.AbsolutePath;
+            var grpcClient = $"{context.DownstreamRequest.Host}:{context.DownstreamRequest.Port}";
 
-            var grpcClient = $"{host}:{port}";
+            var methodDic = new ConcurrentDictionary<string, MethodDescriptor>();
+            var assembly = typeof(Greeter.GreeterClient).Assembly;
+            var types = assembly.GetTypes();
+            var fileTypes = types.Where(type => type.Name.EndsWith("Reflection"));
 
-            var myServices = new Dictionary<string, MyServiceInfo>();
-
-            using (var stream = typeof(Greeter.GreeterClient).Assembly.GetManifestResourceStream("GrpcShared.greet.pb"))
+            foreach (var type in fileTypes)
             {
-                var fileDescriptorSet = Serializer.Deserialize<FileDescriptorSet>(stream);
-                var fileDescriptorProtos = fileDescriptorSet.Files.Where(f => f.Package == "Greet");
+                BindingFlags flag = BindingFlags.Static | BindingFlags.Public;
+                var property = type.GetProperties(flag).Where(t => t.Name == "Descriptor").FirstOrDefault();
+                if (property is null)
+                    continue;
 
-                //new ServerReflectionRequest().
+                if (!(property.GetValue(null) is FileDescriptor fileDescriptor))
+                    continue;
 
-                foreach (var fileDescriptorProto in fileDescriptorProtos)
+                foreach (var svr in fileDescriptor.Services)
                 {
-                    foreach (var service in fileDescriptorProto.Services)
+                    var srvName = svr.FullName.ToUpper();
+                    foreach (var method in svr.Methods)
                     {
-                        foreach (var method in service.Methods)
-                        {
-                            MyServiceInfo myService;
-
-                            myService = new MyServiceInfo
-                            {
-                                Name = $"{fileDescriptorProto.Package}.{service.Name}",
-                                CSharpNameSpace = fileDescriptorProto.Options.CsharpNamespace,
-                                ServiceType = Type.GetType($"{fileDescriptorProto.Options.CsharpNamespace}.{service.Name}, {fileDescriptorProto.Options.CsharpNamespace}")
-                            };
-
-                            MyMethodInfo myMethod;
-
-                            myMethod = new MyMethodInfo
-                            {
-                                Name = method.Name,
-                                AbsolutePath = $"/{myService.Name}/{method.Name}",
-                                InputType = Type.GetType($"{myService.CSharpNameSpace}.{method.InputType.Split(".").Last()}, {myService.CSharpNameSpace}"),
-                                OutputType = Type.GetType($"{myService.CSharpNameSpace}.{method.OutputType.Split(".").Last()}, {myService.CSharpNameSpace}")
-                            };
-
-                           myService.Methods.Add(myMethod);
-                           myServices.Add($"/{myService.Name}/{method.Name}", myService);
-                        }
+                        methodDic.TryAdd(method.Name.ToUpper(), method);
                     }
                 }
-
-                var calledService = myServices.GetValueOrDefault(absolutePath);
-
-                var channel = new Channel(grpcClient, ChannelCredentials.Insecure);
-                var client = new ServerReflectionClient(channel);
-                var response = await SingleRequestAsync(client, new ServerReflectionRequest
-                {
-                    ListServices = "" // Get all services
-                });
-
-                /*var client = calledService.ServiceType
-                    .GetConstructor(new[] { typeof(Channel) })
-                    .Invoke(new object[] { channel });
-
-                client.GetType().InvokeMember(
-                    calledService.Methods[0].Name,
-                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.InvokeMethod,
-                    null,
-                    client,
-                    new[] { new HelloRequest() });*/
             }
 
+            var methodCaller = methodDic.GetValueOrDefault(absolutePath.Split("/").Last().ToUpperInvariant());
+            var channel = new Channel(grpcClient, ChannelCredentials.Insecure);
+            var client = new MethodDescriptorClient(channel);
+            var result = client.InvokeAsync(methodCaller, new Dictionary<string, string>(), new HelloRequest()); //todo: replace with dynamic
+
             OkResponse<GrpcHttpContent> httpResponse;
-            httpResponse = new OkResponse<GrpcHttpContent>(new GrpcHttpContent(myServices));
+            httpResponse = new OkResponse<GrpcHttpContent>(new GrpcHttpContent(result));
 
             context.HttpContext.Response.ContentType = "application/json";
             context.DownstreamResponse = new DownstreamResponse(httpResponse.Data, HttpStatusCode.OK, httpResponse.Data.Headers, "GrpcHttpGatewayMiddleware");
-        }
-
-        private static async Task<ServerReflectionResponse> SingleRequestAsync(ServerReflectionClient client, ServerReflectionRequest request)
-        {
-            var call = client.ServerReflectionInfo();
-            await call.RequestStream.WriteAsync(request);
-            var response = call.ResponseStream.Current;
-            await call.RequestStream.CompleteAsync();
-            return response;
         }
     }
 

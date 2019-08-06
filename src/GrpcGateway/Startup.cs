@@ -1,12 +1,8 @@
-﻿using System;
-using Grpc.Core;
-using GrpcGateway.Extensions;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Ocelot.DependencyInjection;
-using Ocelot.Middleware;
+using System;
 
 namespace GrpcGateway
 {
@@ -22,12 +18,6 @@ namespace GrpcGateway
 
         public void ConfigureServices(IServiceCollection services)
         {
-            //services.AddOcelot(Configuration);
-            /*services.Scan(s =>
-                s.FromCallingAssembly()
-                    .AddClasses(c => c.AssignableTo(typeof(ClientBase<>)))
-                    .AsImplementedInterfaces()
-                    .WithScopedLifetime());*/
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
@@ -36,15 +26,6 @@ namespace GrpcGateway
             {
                 app.UseDeveloperExceptionPage();
             }
-
-            /*app.Run(async (context) =>
-            {
-                await context.Response.WriteAsync("Hello World!");
-            });*/
-            /*app.UseOcelot(config =>
-            {
-                config.AddGrpcHttpGateway();
-            }).Wait();*/
         }
     }
 }
