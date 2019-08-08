@@ -10,18 +10,11 @@ namespace GrpcGateway.Grpc
 {
     public class MethodDescriptorClient : ClientBase<MethodDescriptorClient>
     {
-        public MethodDescriptorClient(Channel channel) : this(new MiddlewareCallInvoker(channel))
-        {
-            // CallInvoker invoker = new MiddlewareCallInvoker(channel);
-            // Channel channel = new Channel("127.0.0.1:50051", ChannelCredentials.Insecure);
-            // CallInvoker invoker = new MiddlewareCallInvoker(channel, MiddlewarePipeline);
-        }
-
-        public MethodDescriptorClient(CallInvoker callInvoker) : base(callInvoker)
+        public MethodDescriptorClient()
         {
         }
 
-        public MethodDescriptorClient() : base()
+        public MethodDescriptorClient(Channel channel) : base(channel)
         {
         }
 
@@ -34,9 +27,6 @@ namespace GrpcGateway.Grpc
             return new MethodDescriptorClient(configuration);
         }
 
-        /// <summary>
-        /// InvokeAsync
-        /// </summary>
         public Task<object> InvokeAsync(MethodDescriptor method, IDictionary<string, string> headers, object requestObject)
         {
             object requests;
@@ -114,16 +104,6 @@ namespace GrpcGateway.Grpc
             return invoker.AsyncUnaryCall(method, null, option, request).ResponseAsync;
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <typeparam name="TRequest"></typeparam>
-        /// <typeparam name="TResponse"></typeparam>
-        /// <param name="invoker"></param>
-        /// <param name="method"></param>
-        /// <param name="option"></param>
-        /// <param name="requests"></param>
-        /// <returns></returns>
         private async Task<TResponse> AsyncClientStreamingCall<TRequest, TResponse>(CallInvoker invoker, Method<TRequest, TResponse> method, CallOptions option, IEnumerable<TRequest> requests) where TRequest : class where TResponse : class
         {
             using (AsyncClientStreamingCall<TRequest, TResponse> call = invoker.AsyncClientStreamingCall(method, null, option))
@@ -142,16 +122,6 @@ namespace GrpcGateway.Grpc
             }
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <typeparam name="TRequest"></typeparam>
-        /// <typeparam name="TResponse"></typeparam>
-        /// <param name="invoker"></param>
-        /// <param name="method"></param>
-        /// <param name="option"></param>
-        /// <param name="request"></param>
-        /// <returns></returns>
         private async Task<IList<TResponse>> AsyncServerStreamingCall<TRequest, TResponse>(CallInvoker invoker, Method<TRequest, TResponse> method, CallOptions option, TRequest request) where TRequest : class where TResponse : class
         {
             using (AsyncServerStreamingCall<TResponse> call = invoker.AsyncServerStreamingCall(method, null, option, request))
@@ -167,16 +137,6 @@ namespace GrpcGateway.Grpc
             }
         }
 
-        /// <summary>
-        ///
-        /// </summary>
-        /// <typeparam name="TRequest"></typeparam>
-        /// <typeparam name="TResponse"></typeparam>
-        /// <param name="invoker"></param>
-        /// <param name="method"></param>
-        /// <param name="option"></param>
-        /// <param name="requests"></param>
-        /// <returns></returns>
         private async Task<IList<TResponse>> AsyncDuplexStreamingCall<TRequest, TResponse>(CallInvoker invoker, Method<TRequest, TResponse> method, CallOptions option, IEnumerable<TRequest> requests) where TRequest : class where TResponse : class
         {
             using (AsyncDuplexStreamingCall<TRequest, TResponse> call = invoker.AsyncDuplexStreamingCall(method, null, option))

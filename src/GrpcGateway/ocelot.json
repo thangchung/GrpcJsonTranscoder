@@ -1,6 +1,7 @@
 ﻿{
   "ReRoutes": [
     {
+      "UpstreamPathTemplate": "/",
       "DownstreamPathTemplate": "/Greet.Greeter/SayHello",
       "DownstreamScheme": "grpc",
       "DownstreamHostAndPorts": [
@@ -8,11 +9,10 @@
           "Host": "127.0.0.1",
           "Port": 5001
         }
-      ],
-      "UpstreamPathTemplate": "/",
-      "UpstreamHttpMethod": [ "Get" ]
+      ]
     },
     {
+      "UpstreamPathTemplate": "/say",
       "DownstreamPathTemplate": "/Greet.Greeter/SayHello123",
       "DownstreamScheme": "grpc",
       "DownstreamHostAndPorts": [
@@ -20,9 +20,21 @@
           "Host": "127.0.0.1",
           "Port": 5001
         }
-      ],
-      "UpstreamPathTemplate": "/{message}",
-      "UpstreamHttpMethod": [ "Get" ]
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/weathers",
+      "DownstreamPathTemplate": "/weatherforecast",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5002
+        }
+      ]
     }
-  ]
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:5000"
+  }
 }

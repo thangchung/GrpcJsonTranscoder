@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TestGrpcConsole", "src\Test
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Gateway", "src\Gateway\Gateway.csproj", "{ECE924B5-584A-45BF-8F31-5398F9361240}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcGateway", "src\GrpcGateway\GrpcGateway.csproj", "{D62D11C3-7682-40C3-8397-60C4DE9BD372}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrpcGateway", "src\GrpcGateway\GrpcGateway.csproj", "{D62D11C3-7682-40C3-8397-60C4DE9BD372}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestRestApi", "src\TestRestApi\TestRestApi.csproj", "{4905FF2C-5F20-4009-9F70-A52D3D05D89C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{D62D11C3-7682-40C3-8397-60C4DE9BD372}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D62D11C3-7682-40C3-8397-60C4DE9BD372}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D62D11C3-7682-40C3-8397-60C4DE9BD372}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4905FF2C-5F20-4009-9F70-A52D3D05D89C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4905FF2C-5F20-4009-9F70-A52D3D05D89C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4905FF2C-5F20-4009-9F70-A52D3D05D89C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4905FF2C-5F20-4009-9F70-A52D3D05D89C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

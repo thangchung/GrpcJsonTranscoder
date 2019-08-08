@@ -17,7 +17,7 @@ namespace TestGrpcServer
         {
             return Task.FromResult(new HelloReply
             {
-                Message = "Hello " + request.Name
+                Message = "Hello"
             });
         }
 
@@ -25,8 +25,8 @@ namespace TestGrpcServer
         {
             return Task.FromResult(new HelloReply
             {
-                Message = "Hello " + request.Name + "from 123"
-            }); ;
+                Message = "Hello " + request.Name
+            });
         }
     }
 }

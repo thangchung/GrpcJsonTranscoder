@@ -8,12 +8,12 @@ namespace GrpcGateway.Grpc
 {
     public class GrpcMethod<TRequest, KResult> where TRequest : class, IMessage<TRequest> where KResult : class, IMessage<KResult>
     {
-        private static ConcurrentDictionary<MethodDescriptor, Method<TRequest, KResult>> methods
+        private static ConcurrentDictionary<MethodDescriptor, Method<TRequest, KResult>> _methods
             = new ConcurrentDictionary<MethodDescriptor, Method<TRequest, KResult>>();
 
-        public static Method<TRequest, KResult> GetMethod(MethodDescriptor methodDescriptor)//Method<TRequest, KResult>
+        public static Method<TRequest, KResult> GetMethod(MethodDescriptor methodDescriptor)
         {
-            if (methods.TryGetValue(methodDescriptor, out Method<TRequest, KResult> method))
+            if (_methods.TryGetValue(methodDescriptor, out Method<TRequest, KResult> method))
                 return method;
 
             int mtype = 0;
@@ -23,10 +23,14 @@ namespace GrpcGateway.Grpc
                 mtype += 2;
             var methodType = (MethodType)Enum.ToObject(typeof(MethodType), mtype);
 
-            var _method = new Method<TRequest, KResult>(methodType, methodDescriptor.Service.FullName
-                , methodDescriptor.Name, ArgsParser<TRequest>.Marshaller, ArgsParser<KResult>.Marshaller);
+            var _method = new Method<TRequest, KResult>(
+                methodType, 
+                methodDescriptor.Service.FullName, 
+                methodDescriptor.Name, 
+                ArgsParser<TRequest>.Marshaller, 
+                ArgsParser<KResult>.Marshaller);
 
-            methods.TryAdd(methodDescriptor, _method);
+            _methods.TryAdd(methodDescriptor, _method);
 
             return _method;
         }

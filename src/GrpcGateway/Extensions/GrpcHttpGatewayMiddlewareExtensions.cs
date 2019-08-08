@@ -2,15 +2,20 @@
 using Ocelot.Authentication.Middleware;
 using Ocelot.Authorisation.Middleware;
 using Ocelot.Cache.Middleware;
+using Ocelot.DownstreamRouteFinder.Middleware;
 using Ocelot.DownstreamUrlCreator.Middleware;
+using Ocelot.Errors.Middleware;
 using Ocelot.Headers.Middleware;
 using Ocelot.LoadBalancer.Middleware;
 using Ocelot.Middleware;
 using Ocelot.Middleware.Pipeline;
+using Ocelot.QueryStrings.Middleware;
 using Ocelot.RateLimit.Middleware;
 using Ocelot.Request.Middleware;
 using Ocelot.Requester.Middleware;
 using Ocelot.RequestId.Middleware;
+using Ocelot.Responder.Middleware;
+using Ocelot.Security.Middleware;
 using System;
 using System.Threading.Tasks;
 
@@ -26,6 +31,16 @@ namespace GrpcGateway.Extensions
 
         private static Func<DownstreamContext, bool> AddGrpcHttpGateway(this IOcelotPipelineBuilder builder, OcelotPipelineConfiguration pipelineConfiguration)
         {
+            builder.UseExceptionHandlerMiddleware();
+
+            builder.UseIfNotNull(pipelineConfiguration.PreErrorResponderMiddleware);
+
+            builder.UseResponderMiddleware();
+
+            builder.UseDownstreamRouteFinderMiddleware();
+
+            builder.UseSecurityMiddleware();
+
             builder.UseHttpHeadersTransformationMiddleware();
 
             builder.UseDownstreamRequestInitialiser();
@@ -45,7 +60,7 @@ namespace GrpcGateway.Extensions
                 builder.Use(pipelineConfiguration.AuthenticationMiddleware);
             }
 
-            //builder.UseClaimsBuilderMiddleware();
+            builder.UseClaimsToHeadersMiddleware();
 
             builder.UseIfNotNull(pipelineConfiguration.PreAuthorisationMiddleware);
 
@@ -58,11 +73,11 @@ namespace GrpcGateway.Extensions
                 builder.Use(pipelineConfiguration.AuthorisationMiddleware);
             }
 
-            //builder.UseHttpRequestHeadersBuilderMiddleware();
+            builder.UseClaimsToHeadersMiddleware();
 
             builder.UseIfNotNull(pipelineConfiguration.PreQueryStringBuilderMiddleware);
 
-            //builder.UseQueryStringBuilderMiddleware();
+            builder.UseClaimsToQueryStringMiddleware();
 
             builder.UseLoadBalancingMiddleware();
 
@@ -70,7 +85,7 @@ namespace GrpcGateway.Extensions
 
             builder.UseOutputCacheMiddleware();
 
-            builder.UseGrpcHttpGatewayMiddleware();
+            builder.UseGrpcHttpGatewayMiddleware(); // this is ours
 
             builder.UseHttpRequesterMiddleware();
 
