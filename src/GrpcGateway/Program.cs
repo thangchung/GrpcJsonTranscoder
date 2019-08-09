@@ -1,15 +1,13 @@
-﻿using System;
-using System.IO;
-using System.Threading.Tasks;
-using GrpcGateway.Extensions;
+﻿using GrpcJsonTranscoder.Middleware;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace GrpcGateway
 {
@@ -24,9 +22,6 @@ namespace GrpcGateway
             WebHost.CreateDefaultBuilder(args)
                 .UseKestrel()
                 .UseUrls("http://localhost:5000")
-                .ConfigureKestrel(o => {
-                    o.AllowSynchronousIO = false;
-                })
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
                     config
@@ -36,16 +31,25 @@ namespace GrpcGateway
                         .AddJsonFile("ocelot.json", false, false)
                         .AddEnvironmentVariables();
                 })
-                .ConfigureServices(s =>
+                .ConfigureServices(services =>
                 {
-                    AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
-                    //s.AddHttpContextAccessor();
-                    //s.AddScoped<IHttpContextAccessor, HttpContextAccessor>();
-                    s.AddOcelot();
+                    services.AddOcelot();
                 })
-                .Configure(a =>
+                .Configure(app =>
                 {
-                    a.UseOcelot(config => config.AddGrpcHttpGateway());
+                    var configuration = new OcelotPipelineConfiguration
+                    {
+                        PreQueryStringBuilderMiddleware = async (ctx, next) =>
+                        {
+                            var routes = ctx.TemplatePlaceholderNameAndValues;
+                            ctx.DownstreamRequest.Headers.Add(
+                                "x-grpc-routes",
+                                JsonConvert.SerializeObject(routes.Select(x => new NameAndValue { Name = x.Name, Value = x.Value })));
+                            await next.Invoke();
+                        }
+                    };
+
+                    app.UseOcelot(configuration).Wait();
                 })
                 .Build();
     }

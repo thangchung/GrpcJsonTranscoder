@@ -36,8 +36,9 @@ namespace TestRestApi.Controllers
         }
 
         [HttpPost]
-        public IEnumerable<WeatherForecast> Post()
+        public IEnumerable<WeatherForecast> Post([FromBody] DataDto dto)
         {
+            var sample = dto.Data;
             var rng = new Random();
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
@@ -46,6 +47,11 @@ namespace TestRestApi.Controllers
                 Summary = Summaries[rng.Next(Summaries.Length)]
             })
             .ToArray();
+        }
+
+        public class DataDto
+        {
+            public string Data { get; set; }
         }
     }
 }

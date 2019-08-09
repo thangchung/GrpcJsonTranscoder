@@ -4,8 +4,6 @@ option csharp_namespace = "GrpcShared";
 
 package Greet;
 
-import "google/api/annotations.proto";
-
 // The greeting service definition.
 service Greeter {
   // Sends a greeting

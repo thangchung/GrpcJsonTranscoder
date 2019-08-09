@@ -9,14 +9,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Remove="greet.pb" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <EmbeddedResource Include="greet.pb" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Google.Api.Gax.Grpc" Version="2.10.0-beta02" />
     <PackageReference Include="Google.Protobuf" Version="3.8.0" />
     <PackageReference Include="Grpc.Tools" Version="1.21.0" PrivateAssets="All" />

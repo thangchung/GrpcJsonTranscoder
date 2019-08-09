@@ -6,25 +6,25 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GrpcGateway.Grpc
+namespace GrpcJsonTranscoder.Grpc
 {
-    public class MethodDescriptorClient : ClientBase<MethodDescriptorClient>
+    public class MethodDescriptorCaller : ClientBase<MethodDescriptorCaller>
     {
-        public MethodDescriptorClient()
+        public MethodDescriptorCaller()
         {
         }
 
-        public MethodDescriptorClient(Channel channel) : base(channel)
+        public MethodDescriptorCaller(Channel channel) : base(channel)
         {
         }
 
-        protected MethodDescriptorClient(ClientBaseConfiguration configuration) : base(configuration)
+        protected MethodDescriptorCaller(ClientBaseConfiguration configuration) : base(configuration)
         {
         }
 
-        protected override MethodDescriptorClient NewInstance(ClientBaseConfiguration configuration)
+        protected override MethodDescriptorCaller NewInstance(ClientBaseConfiguration configuration)
         {
-            return new MethodDescriptorClient(configuration);
+            return new MethodDescriptorCaller(configuration);
         }
 
         public Task<object> InvokeAsync(MethodDescriptor method, IDictionary<string, string> headers, object requestObject)
@@ -42,7 +42,7 @@ namespace GrpcGateway.Grpc
                 requests = ary;
             }
 
-            System.Reflection.MethodInfo m = typeof(MethodDescriptorClient).GetMethod("CallGrpcAsyncCore", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            System.Reflection.MethodInfo m = typeof(MethodDescriptorCaller).GetMethod("CallGrpcAsyncCore", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
 
             Task<object> task = (Task<object>)m.MakeGenericMethod(new Type[] { method.InputType.ClrType, method.OutputType.ClrType }).Invoke(this, new object[] { method, headers, requests });
 

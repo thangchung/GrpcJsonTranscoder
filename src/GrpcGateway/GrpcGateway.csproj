@@ -6,15 +6,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Grpc.Reflection" Version="1.22.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
-    <PackageReference Include="Google.Protobuf" Version="3.8.0" />
     <PackageReference Include="Ocelot" Version="13.5.2" />
-    <PackageReference Include="protobuf-net.Reflection" Version="2.3.17" />
-    <PackageReference Include="Scrutor" Version="3.0.2" />
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\GrpcJsonTranscoder\GrpcJsonTranscoder.csproj" />
     <ProjectReference Include="..\GrpcShared\GrpcShared.csproj" />
   </ItemGroup>
 

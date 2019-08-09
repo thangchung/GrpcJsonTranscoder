@@ -4,7 +4,7 @@ using Grpc.Core;
 using System;
 using System.Collections.Concurrent;
 
-namespace GrpcGateway.Grpc
+namespace GrpcJsonTranscoder.Grpc
 {
     public class GrpcMethod<TRequest, KResult> where TRequest : class, IMessage<TRequest> where KResult : class, IMessage<KResult>
     {
@@ -24,10 +24,10 @@ namespace GrpcGateway.Grpc
             var methodType = (MethodType)Enum.ToObject(typeof(MethodType), mtype);
 
             var _method = new Method<TRequest, KResult>(
-                methodType, 
-                methodDescriptor.Service.FullName, 
-                methodDescriptor.Name, 
-                ArgsParser<TRequest>.Marshaller, 
+                methodType,
+                methodDescriptor.Service.FullName,
+                methodDescriptor.Name,
+                ArgsParser<TRequest>.Marshaller,
                 ArgsParser<KResult>.Marshaller);
 
             _methods.TryAdd(methodDescriptor, _method);
