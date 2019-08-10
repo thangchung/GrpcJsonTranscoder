@@ -1,6 +1,7 @@
 # Grpc-Json Transcoder project
 
 [![Price](https://img.shields.io/badge/price-FREE-0098f7.svg)](https://github.com/thangchung/GrpcJsonTranscoder/blob/master/LICENSE)
+[![version](https://img.shields.io/nuget/v/GrpcJsonTranscoder.svg?label=version)](https://www.nuget.org/packages?q=GrpcJsonTranscoder)
 
 This is a filter that allows a RESTful JSON API client (Ocelot Gateway) to send requests to .NET Web API (Aggregation Service) over HTTP and get proxied to a gRPC service (on behind).
 
@@ -26,16 +27,34 @@ $ bash
 $ start.sh # I haven't done it yet :p
 ```
 
+- OcelotGateway (.NET Core 2.2): http://localhost:5000
+- AggregationRestApi (.NET Core 3.0): http://localhost:5001
+- ProductCatalogGrpcServer (.NET Core 3.0): http://localhost:5002
+- GreatGrpcServer (.NET Core 3.0): http://localhost:5003
+
+Test it as below:
+
+```bash
+$ curl -X GET -H 'content-type: application/grpc' -k http://localhost:5000/say/Bob
+$ {"Message":"Hello Bob"}
+```
+
+```bash
+$ curl -X GET -H 'content-type: application/grpc' -k http://localhost:5000/products
+$ {"Products":[{"Id":1,"Name":"product 1","Quantity":52,"Description":"description of product 1"},...]}
+```
+
+```bash
+$ curl -X POST -H 'content-type: application/grpc' -d '{ "name": "product 1", "quantity": 1, "description": "this is product 1" }' -k http://localhost:5000/products
+$ {"Product":{"Id":915,"Name":"product 1 created","Quantity":1,"Description":"this is product 1 created"}}
+```
+
+
 ## How to understand it!
 
 The project aim is for .NET community and its ecosystem which leverage the power of [Ocelot Gateway](https://github.com/ThreeMammals/Ocelot) which is very power in the gateway components were used by varous of companies and sample source code when we try to adopt the microservices architecture project.
 
 ![](assets/overview.png)
-
-- OcelotGateway (.NET Core 2.2): http://localhost:5000
-- AggregationRestApi (.NET Core 3.0): http://localhost:5001
-- ProductCatalogGrpcServer (.NET Core 3.0): http://localhost:5002
-- GreatGrpcServer (.NET Core 3.0): http://localhost:5003
 
 We will normally use Ocelot configuration for the transcode process, the main parser and transformation processes are only happen at aggregation service level so that you will easy to upgrade Ocelot in case we need, but not effect to the grpc-json transcode seats in the aggregation service. 
 

@@ -26,13 +26,11 @@ namespace GrpcJsonTranscoder.Middleware
 
         public async Task Invoke(HttpContext context, GrpcAssemblyResolver grpcAssemblyResolver, IOptions<GrpcMapperOptions> options)
         {
-            if (!context.Request.Query.Any(q => q.Key == "grpc" && Convert.ToBoolean(q.Value) == true)) await _next(context);
+            if (!context.Request.Headers.Any(h => h.Key.ToLowerInvariant() == "content-type" && h.Value == "application/grpc")) await _next(context);
             else
             {
                 var path = context.Request.Path.Value;
-
                 var methodDescriptor = grpcAssemblyResolver.FindMethodDescriptor(path.Split('/').Last().ToUpperInvariant());
-
                 if (methodDescriptor == null) await _next(context);
                 else
                 {
@@ -47,16 +45,13 @@ namespace GrpcJsonTranscoder.Middleware
                     }
 
                     var grpcLookupTable = options.Value.GrpcMappers;
-
-                    var requestObject = JsonConvert.DeserializeObject(requestData, methodDescriptor.InputType.ClrType);
-
                     var grpcClient = grpcLookupTable.FirstOrDefault(x => x.GrpcMethod == path).GrpcHost; //todo: should catch object to throw exception
 
                     var channel = new Channel(grpcClient, ChannelCredentials.Insecure);
-
                     var client = new MethodDescriptorCaller(channel);
 
-                    var result = await client.InvokeAsync(methodDescriptor, new Dictionary<string, string>(), requestObject);
+                    var requestObject = JsonConvert.DeserializeObject(requestData, methodDescriptor.InputType.ClrType);
+                    var result = await client.InvokeAsync(methodDescriptor, GetRequestHeaders(context), requestObject);
 
                     await context.Response.WriteAsync(JsonConvert.SerializeObject(result));
                 }
@@ -93,6 +88,30 @@ namespace GrpcJsonTranscoder.Middleware
             var stream = new StreamReader(context.Request.Body, encoding);
             var json = await stream.ReadToEndAsync();
             return json == string.Empty ? "{}" : json;
+        }
+
+        private IDictionary<string, string> GetRequestHeaders(HttpContext context)
+        {
+            var headers = new Dictionary<string, string>();
+            foreach (string key in context.Request.Headers.Keys)
+            {
+                if (key.StartsWith(":"))
+                {
+                    continue;
+                }
+                if (key.StartsWith("grpc-", StringComparison.OrdinalIgnoreCase))
+                {
+                    continue;
+                }
+                else if (key.ToLowerInvariant() == "content-type" || key.ToLowerInvariant() == "authorization")
+                {
+                    //todo: investigate it more
+                    var value = context.Request.Headers[key];
+                    headers.Add(key, value.FirstOrDefault());
+                }
+            }
+
+            return headers;
         }
     }
 }

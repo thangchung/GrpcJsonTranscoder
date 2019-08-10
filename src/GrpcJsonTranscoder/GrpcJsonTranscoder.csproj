@@ -7,9 +7,13 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>0.1.0</Version>
     <Description>gRPC-JSON transcoder - This is a filter which allows a RESTful JSON API client to send requests to .NET web server over HTTP and get proxied to a gRPC service</Description>
-    <Copyright>Thang Chung</Copyright>
+    <Copyright>@ Thang Chung</Copyright>
     <PackageProjectUrl>https://github.com/thangchung/GrpcJsonTranscoder</PackageProjectUrl>
     <RepositoryUrl>https://github.com/thangchung/GrpcJsonTranscoder</RepositoryUrl>
+    <Authors>Thang Chung</Authors>
+    <Company />
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>

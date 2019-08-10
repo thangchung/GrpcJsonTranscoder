@@ -19,7 +19,7 @@ namespace ProductCatalogGrpcServer.Services
         {
             var products = new List<ProductDto>();
 
-            for (int i = 1; i <= 100; i++)
+            for (int i = 1; i <= 5; i++)
             {
                 products.Add(new ProductDto
                 {
