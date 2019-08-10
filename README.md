@@ -5,7 +5,7 @@
 
 This is a filter that allows a RESTful JSON API client (Ocelot Gateway) to send requests to .NET Web API (Aggregation Service) over HTTP and get proxied to a gRPC service (on behind).
 
-This project is inspired by [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway) which is totally for golang, [grpc-dynamic-gateway](https://github.com/konsumer/grpc-dynamic-gateway) is for nodejs. And especially, [Envoy gRPC-JSON transcoder](https://www.envoyproxy.io/docs/envoy/latest/configuration/http_filters/grpc_json_transcoder_filter) is the best of transcode in this area, but it is only on the infrastructure level. You also can use it just like my project used at [https://github.com/vietnam-devs/coolstore-microservices/tree/master](https://github.com/vietnam-devs/coolstore-microservices/blob/master/deploys/dockers/envoy-proxy/envoy.yaml).
+This project is inspired by [grpc-gateway](https://github.com/grpc-ecosystem/grpc-gateway) which is totally for golang, [grpc-dynamic-gateway](https://github.com/konsumer/grpc-dynamic-gateway) is for nodejs. And especially, [Envoy gRPC-JSON transcoder](https://www.envoyproxy.io/docs/envoy/latest/configuration/http_filters/grpc_json_transcoder_filter) is the best of transcoding in this area, but it is only on the infrastructure level. You also can use it just like my project used at [coolstore-microservices](https://github.com/vietnam-devs/coolstore-microservices/blob/master/deploys/dockers/envoy-proxy/envoy.yaml).
 
 ## Give a Star!
 
@@ -26,6 +26,8 @@ or
 $ bash
 $ start.sh # I haven't done it yet :p
 ```
+
+> In the mean time, we open up the visual studio, run multiple projects included OcelotGateway, AggregationRestApi, ProductCatalogGrpcServer and GreatGrpcServer
 
 - OcelotGateway (.NET Core 2.2): http://localhost:5000
 - AggregationRestApi (.NET Core 3.0): http://localhost:5001
@@ -49,14 +51,13 @@ $ curl -X POST -H 'content-type: application/grpc' -d '{ "name": "product 1", "q
 $ {"Product":{"Id":915,"Name":"product 1 created","Quantity":1,"Description":"this is product 1 created"}}
 ```
 
-
 ## How to understand it!
 
-The project aim is for .NET community and its ecosystem which leverage the power of [Ocelot Gateway](https://github.com/ThreeMammals/Ocelot) which is very power in the gateway components were used by varous of companies and sample source code when we try to adopt the microservices architecture project.
+The project aims to .NET community and its ecosystem which leverage the power of [Ocelot Gateway](https://github.com/ThreeMammals/Ocelot) which is very powerful in the gateway components were used by various of companies and sample source code when we try to adopt the microservices architecture project.
 
 ![](assets/overview.png)
 
-We will normally use Ocelot configuration for the transcode process, the main parser and transformation processes are only happen at aggregation service level so that you will easy to upgrade Ocelot in case we need, but not effect to the grpc-json transcode seats in the aggregation service. 
+We will normally use Ocelot configuration for the transcode process, the main parser and transformation processes are only happening at aggregation service level so that you will easy to upgrade Ocelot in case we need, but not affect to the grpc-json transcode seats in the aggregation service.
 
 ```json
 // ocelot.json
@@ -124,9 +125,9 @@ var configuration = new OcelotPipelineConfiguration
 app.UseOcelot(configuration).Wait();
 ```
 
-More at https://github.com/thangchung/GrpcJsonTranscoder/tree/master/src/OcelotGateway
+More at https://github.com/thangchung/GrpcJsonTranscoder/tree/master/samples/OcelotGateway
 
-Then we only put some of json configuration into appsettings.json inside aggregation service to point it to other gRPC services we need.
+Then we only put some of the json configurations into `appsettings.json` inside aggregation service to point it to other gRPC services we need.
 
 ```json
 // appsettings.json
@@ -167,11 +168,11 @@ public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
 }
 ```
 
-More at https://github.com/thangchung/GrpcJsonTranscoder/tree/master/src/AggregationRestApi
+More at https://github.com/thangchung/GrpcJsonTranscoder/tree/master/samples/AggregationRestApi
 
 ### **Don't believe what I said. Try it!**
 
-> We haven't tested it with stream and duplex transport protocols yet. So we feel free to contribute by community.
+> We haven't tested it with stream and full-duplex transport protocols yet. So we feel free to contribute by the .NET community.
 
 ## Contributing
 
