@@ -11,8 +11,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\GrpcJsonTranscoder\GrpcJsonTranscoder.csproj" />
-    <ProjectReference Include="..\GrpcShared\GrpcShared.csproj" />
+    <ProjectReference Include="..\..\src\GrpcJsonTranscoder\GrpcJsonTranscoder.csproj" />
   </ItemGroup>
 
   <ItemGroup>
