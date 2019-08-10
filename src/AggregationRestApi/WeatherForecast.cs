@@ -1,6 +1,6 @@
 using System;
 
-namespace TestRestApi
+namespace AggregationRestApi
 {
     public class WeatherForecast
     {

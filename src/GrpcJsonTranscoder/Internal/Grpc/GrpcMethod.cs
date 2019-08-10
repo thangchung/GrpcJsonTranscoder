@@ -4,9 +4,11 @@ using Grpc.Core;
 using System;
 using System.Collections.Concurrent;
 
-namespace GrpcJsonTranscoder.Grpc
+namespace GrpcJsonTranscoder.Internal.Grpc
 {
-    public class GrpcMethod<TRequest, KResult> where TRequest : class, IMessage<TRequest> where KResult : class, IMessage<KResult>
+    internal class GrpcMethod<TRequest, KResult> 
+        where TRequest : class, IMessage<TRequest>, new()
+        where KResult : class, IMessage<KResult>, new()
     {
         private static ConcurrentDictionary<MethodDescriptor, Method<TRequest, KResult>> _methods
             = new ConcurrentDictionary<MethodDescriptor, Method<TRequest, KResult>>();
@@ -36,9 +38,9 @@ namespace GrpcJsonTranscoder.Grpc
         }
     }
 
-    public static class ArgsParser<T> where T : class, IMessage<T>
+    internal static class ArgsParser<T> where T : class, IMessage<T>, new()
     {
-        public static MessageParser<T> Parser = new MessageParser<T>(() => Activator.CreateInstance<T>());
+        public static MessageParser<T> Parser = new MessageParser<T>(() => Factory<T>.CreateInstance());
         public static Marshaller<T> Marshaller = Marshallers.Create((arg) => MessageExtensions.ToByteArray(arg), Parser.ParseFrom);
     }
 }

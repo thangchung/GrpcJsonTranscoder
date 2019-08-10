@@ -1,4 +1,4 @@
-﻿using GrpcJsonTranscoder.Middleware;
+﻿using GrpcJsonTranscoder.Models;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
@@ -9,7 +9,7 @@ using Ocelot.Middleware;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GrpcGateway
+namespace OcelotGateway
 {
     public class Program
     {

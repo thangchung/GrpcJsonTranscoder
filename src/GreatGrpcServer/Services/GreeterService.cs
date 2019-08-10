@@ -3,7 +3,7 @@ using Grpc.Core;
 using GrpcShared;
 using Microsoft.Extensions.Logging;
 
-namespace TestGrpcServer
+namespace GreatGrpcServer
 {
     public class GreeterService : Greeter.GreeterBase
     {
@@ -17,15 +17,7 @@ namespace TestGrpcServer
         {
             return Task.FromResult(new HelloReply
             {
-                Message = "Hello"
-            });
-        }
-
-        public override Task<HelloReply> SayHello123(HelloRequest request, ServerCallContext context)
-        {
-            return Task.FromResult(new HelloReply
-            {
-                Message = "Hello " + request.Name
+                Message = $"Hello {request.Name}" 
             });
         }
     }

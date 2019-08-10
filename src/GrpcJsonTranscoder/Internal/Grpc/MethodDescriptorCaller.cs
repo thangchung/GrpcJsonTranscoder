@@ -6,9 +6,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace GrpcJsonTranscoder.Grpc
+namespace GrpcJsonTranscoder.Internal.Grpc
 {
-    public class MethodDescriptorCaller : ClientBase<MethodDescriptorCaller>
+    internal class MethodDescriptorCaller : ClientBase<MethodDescriptorCaller>
     {
         public MethodDescriptorCaller()
         {
@@ -49,7 +49,9 @@ namespace GrpcJsonTranscoder.Grpc
             return task;
         }
 
-        private Task<object> CallGrpcAsyncCore<TRequest, TResponse>(MethodDescriptor method, IDictionary<string, string> headers, IEnumerable<TRequest> requests) where TRequest : class, IMessage<TRequest> where TResponse : class, IMessage<TResponse>
+        private Task<object> CallGrpcAsyncCore<TRequest, TResponse>(MethodDescriptor method, IDictionary<string, string> headers, IEnumerable<TRequest> requests) 
+            where TRequest : class, IMessage<TRequest>, new()
+            where TResponse : class, IMessage<TResponse>, new()
         {
             CallOptions option = CreateCallOptions(headers);
             var rpc = GrpcMethod<TRequest, TResponse>.GetMethod(method);

@@ -1,5 +1,5 @@
-using GrpcJsonTranscoder.Extensions;
-using GrpcJsonTranscoder.Middleware;
+using GrpcJsonTranscoder;
+using GrpcJsonTranscoder.Grpc;
 using GrpcShared;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -7,7 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace TestRestApi
+namespace AggregationRestApi
 {
     public class Startup
     {
@@ -22,7 +22,7 @@ namespace TestRestApi
         {
             services.AddControllers();
 
-            services.AddGrpcJsonTranscoder(() => GrpcAssemblyResolver.Configuration(typeof(Greeter.GreeterClient).Assembly));
+            services.AddGrpcJsonTranscoder(() => new GrpcAssemblyResolver().ConfigGrpcAssembly(typeof(Greeter.GreeterClient).Assembly));
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
@@ -32,7 +32,7 @@ namespace TestRestApi
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseMiddleware<GrpcHttpParserMiddleware>();
+            app.UseGrpcJsonTranscoder();
 
             app.UseRouting();
 

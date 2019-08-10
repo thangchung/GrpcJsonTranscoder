@@ -1,0 +1,34 @@
+﻿syntax = "proto3";
+
+option csharp_namespace = "GrpcShared";
+
+package ProductCatalog;
+
+service Product {
+  rpc GetProducts (GetProductsRequest) returns (GetProductsReply) {}
+  rpc CreateProduct (CreateProductRequest) returns (CreateProductReply) {}
+}
+
+message GetProductsRequest {
+}
+
+message GetProductsReply {
+  repeated ProductDto products = 1;
+}
+
+message CreateProductRequest {
+  string name = 1;
+  int32 quantity = 2;
+  string description = 3;
+}
+
+message CreateProductReply {
+  ProductDto product = 1;
+}
+
+message ProductDto {
+  int32 id = 1;
+  string name = 2;
+  int32 quantity = 3;
+  string description = 4;
+}

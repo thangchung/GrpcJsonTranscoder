@@ -4,7 +4,7 @@ using System.Linq;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace TestRestApi.Controllers
+namespace AggregationRestApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
