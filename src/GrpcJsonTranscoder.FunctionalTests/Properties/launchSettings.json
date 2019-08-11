@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "GrpcJsonTranscoder.IntegrationTests": {
+      "commandName": "Project"
+    },
+    "Docker": {
+      "commandName": "Docker"
+    }
+  }
+}

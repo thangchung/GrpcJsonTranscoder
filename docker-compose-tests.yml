@@ -1,0 +1,35 @@
+version: "3.7"
+
+services:
+  functional_tests:
+    image: functional_tests
+    build:
+      context: .
+      dockerfile: ./src/GrpcJsonTranscoder.FunctionalTests/Dockerfile
+      target: functional_tests
+    networks:
+      - mynetwork
+    depends_on:
+      - aggregation_service
+    entrypoint:
+      - dotnet
+      - test
+      - --logger
+      - trx;LogFileName=/tests/functional-test-results.xml
+
+  aggregation_service:
+    image: aggregation_service
+    build:
+      context: .
+      dockerfile: ./samples/AggregationRestApi/Dockerfile
+    ports:
+      - "5001:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_URLS=http://*:5001
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    name: mynetwork-network

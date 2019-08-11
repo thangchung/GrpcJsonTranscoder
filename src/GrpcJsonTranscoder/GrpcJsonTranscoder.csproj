@@ -2,8 +2,8 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
-    <SignAssembly>true</SignAssembly>
-    <AssemblyOriginatorKeyFile>GrpcJsonTranscoder.pfx</AssemblyOriginatorKeyFile>
+    <!--<SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>GrpcJsonTranscoder.pfx</AssemblyOriginatorKeyFile>-->
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <Version>0.1.0</Version>
     <Description>gRPC-JSON transcoder - This is a filter which allows a RESTful JSON API client to send requests to .NET web server over HTTP and get proxied to a gRPC service</Description>

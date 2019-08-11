@@ -1,0 +1,61 @@
+version: "3.7"
+
+services:
+  ocelotgateway:
+    image: ocelotgateway
+    build:
+      context: .
+      dockerfile: ./samples/OcelotGateway/Dockerfile
+    ports:
+      - "5000:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - aggregator
+      - cataloggrpc
+      - greetgrpc
+    networks:
+      - mynetwork
+
+  aggregator:
+    image: aggregator
+    build:
+      context: .
+      dockerfile: ./samples/AggregationRestApi/Dockerfile
+    ports:
+      - "5001:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    depends_on:
+      - cataloggrpc
+      - greetgrpc
+    networks:
+      - mynetwork
+
+  cataloggrpc:
+    image: cataloggrpc
+    build:
+      context: .
+      dockerfile: ./samples/ProductCatalogGrpcServer/Dockerfile
+    ports:
+      - "5002:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - mynetwork
+
+  greetgrpc:
+    image: greetgrpc
+    build:
+      context: .
+      dockerfile: ./samples/GreatGrpcServer/Dockerfile
+    ports:
+      - "5003:80"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    name: mynetwork-network

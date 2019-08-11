@@ -21,7 +21,7 @@ namespace OcelotGateway
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseKestrel()
-                .UseUrls("http://localhost:5000")
+                //.UseUrls("http://localhost:5000")
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
                     config
@@ -29,6 +29,7 @@ namespace OcelotGateway
                         .AddJsonFile("appsettings.json", true, true)
                         .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", true, true)
                         .AddJsonFile("ocelot.json", false, false)
+                        .AddJsonFile($"configuration.{hostingContext.HostingEnvironment.EnvironmentName}.json")
                         .AddEnvironmentVariables();
                 })
                 .ConfigureServices(services =>

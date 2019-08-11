@@ -26,7 +26,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GreatGrpcServer", "samples\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProductCatalogGrpcServer", "samples\ProductCatalogGrpcServer\ProductCatalogGrpcServer.csproj", "{9E51C10E-6546-4845-8613-CCFA43FE1873}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GrpcJsonTranscoder.Tests", "src\GrpcJsonTranscoder.Tests\GrpcJsonTranscoder.Tests.csproj", "{28875D10-4EC4-4FD9-BF29-7B41D9369572}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrpcJsonTranscoder.FunctionalTests", "src\GrpcJsonTranscoder.FunctionalTests\GrpcJsonTranscoder.FunctionalTests.csproj", "{108CC360-6D5A-49D1-AA33-7A4DAC140DB2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -58,10 +58,10 @@ Global
 		{9E51C10E-6546-4845-8613-CCFA43FE1873}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{9E51C10E-6546-4845-8613-CCFA43FE1873}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{9E51C10E-6546-4845-8613-CCFA43FE1873}.Release|Any CPU.Build.0 = Release|Any CPU
-		{28875D10-4EC4-4FD9-BF29-7B41D9369572}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{28875D10-4EC4-4FD9-BF29-7B41D9369572}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{28875D10-4EC4-4FD9-BF29-7B41D9369572}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{28875D10-4EC4-4FD9-BF29-7B41D9369572}.Release|Any CPU.Build.0 = Release|Any CPU
+		{108CC360-6D5A-49D1-AA33-7A4DAC140DB2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{108CC360-6D5A-49D1-AA33-7A4DAC140DB2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{108CC360-6D5A-49D1-AA33-7A4DAC140DB2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{108CC360-6D5A-49D1-AA33-7A4DAC140DB2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -19,7 +19,7 @@ Check out my [blog](https://medium.com/@thangchung) or say hi on [Twitter](https
 
 
 ```bash
-$ docker-compose up # I haven't done it yet :p
+$ docker-compose up
 ```
 
 or 
