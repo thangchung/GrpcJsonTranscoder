@@ -21,7 +21,6 @@ namespace OcelotGateway
         public static IWebHost BuildWebHost(string[] args) =>
             WebHost.CreateDefaultBuilder(args)
                 .UseKestrel()
-                //.UseUrls("http://localhost:5000")
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
                     config
