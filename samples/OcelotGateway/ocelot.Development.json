@@ -7,8 +7,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "aggregator",
-          "Port": 80
+          "Host": "localhost",
+          "Port": 5001
         }
       ]
     },
@@ -19,8 +19,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "aggregator",
-          "Port": 80
+          "Host": "localhost",
+          "Port": 5001
         }
       ]
     },
@@ -31,12 +31,13 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "aggregator",
-          "Port": 80
+          "Host": "localhost",
+          "Port": 5001
         }
       ]
     }
   ],
   "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:5000"
   }
 }

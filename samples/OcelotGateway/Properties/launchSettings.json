@@ -10,18 +10,10 @@
   "profiles": {
     "GrpcGateway": {
       "commandName": "Project",
-      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
+      "applicationUrl": "http://localhost:5000/",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      },
-      "httpPort": 80
+      }
     }
-    //"Docker": {
-    //  "commandName": "Docker",
-    //  "launchBrowser": true,
-    //  "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}",
-    //  "environmentVariables": {},
-    //  "httpPort": 10000
-    //}
   }
 }
