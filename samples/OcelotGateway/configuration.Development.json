@@ -2,41 +2,40 @@
   "ReRoutes": [
     {
       "UpstreamPathTemplate": "/say/{name}",
-      "UpstreamHttpMethod": [ "Get" ],
+      "UpstreamHttpMethod": ["Get"],
       "DownstreamPathTemplate": "/Greet.Greeter/SayHello",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "aggregator",
-          "Port": 80
+          "Host": "127.0.0.1",
+          "Port": 5001
         }
       ]
     },
     {
       "UpstreamPathTemplate": "/products",
-      "UpstreamHttpMethod": [ "Get" ],
+      "UpstreamHttpMethod": ["Get"],
       "DownstreamPathTemplate": "/ProductCatalog.Product/GetProducts",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "aggregator",
-          "Port": 80
+          "Host": "127.0.0.1",
+          "Port": 5001
         }
       ]
     },
     {
       "UpstreamPathTemplate": "/products",
-      "UpstreamHttpMethod": [ "Post" ],
+      "UpstreamHttpMethod": ["Post"],
       "DownstreamPathTemplate": "/ProductCatalog.Product/CreateProduct",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "aggregator",
-          "Port": 80
+          "Host": "127.0.0.1",
+          "Port": 5001
         }
       ]
     }
   ],
-  "GlobalConfiguration": {
-  }
+  "GlobalConfiguration": {}
 }
