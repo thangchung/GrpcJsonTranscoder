@@ -1,4 +1,4 @@
-﻿using GrpcJsonTranscoder.Middleware;
+﻿using GrpcJsonTranscoder.Internal.Middleware;
 using Microsoft.AspNetCore.Builder;
 
 namespace GrpcJsonTranscoder

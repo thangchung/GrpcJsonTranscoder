@@ -9,7 +9,7 @@ namespace GrpcJsonTranscoder
     {
         public static IServiceCollection AddGrpcJsonTranscoder(this IServiceCollection services, Func<GrpcAssemblyResolver> addGrpcAssembly)
         {
-            // AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
+            //AppContext.SetSwitch("System.Net.Http.SocketsHttpHandler.Http2UnencryptedSupport", true);
 
             using (var scope = services.BuildServiceProvider().CreateScope())
             {

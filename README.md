@@ -39,25 +39,114 @@ $ start.sh # I haven't done it yet :p
 Test it as below:
 
 ```bash
+# gRPC
 $ curl -X GET -H 'content-type: application/grpc' -k http://localhost:5000/say/Bob
 $ {"Message":"Hello Bob"}
 ```
 
 ```bash
+# gRPC
 $ curl -X GET -H 'content-type: application/grpc' -k http://localhost:5000/products
 $ {"Products":[{"Id":1,"Name":"product 1","Quantity":52,"Description":"description of product 1"},...]}
 ```
 
 ```bash
+# gRPC
 $ curl -X POST -H 'content-type: application/grpc' -d '{ "name": "product 1", "quantity": 1, "description": "this is product 1" }' -k http://localhost:5000/products
 $ {"Product":{"Id":915,"Name":"product 1 created","Quantity":1,"Description":"this is product 1 created"}}
+```
+
+```bash
+# REST Api
+$ curl -X GET -H 'content-type: application/json' -k http://localhost:5000/weather 
+$ [{"date":"2019-08-17T18:34:41.1090164+07:00","temperatureC":-6,"temperatureF":22,"summary":"Sweltering"},{"date":"2019-08-18T18:34:41.1090371+07:00","temperatureC":27,"temperatureF":80,"summary":"Hot"},{"date":"2019-08-19T18:34:41.1090499+07:00","temperatureC":33,"temperatureF":91,"summary":"Balmy"},{"date":"2019-08-20T18:34:41.1090617+07:00","temperatureC":-14,"temperatureF":7,"summary":"Chilly"},{"date":"2019-08-21T18:34:41.1090743+07:00","temperatureC":22,"temperatureF":71,"summary":"Hot"}]
 ```
 
 ## How to understand it!
 
 The project aims to .NET community and its ecosystem which leverage the power of [Ocelot Gateway](https://github.com/ThreeMammals/Ocelot) which is very powerful in the gateway components were used by various of companies and sample source code when we try to adopt the microservices architecture project.
 
-![](assets/overview.png)
+- Option 1: Use directly with Ocelot
+
+![](assets/overview_option1.png)
+
+That's quite simple with only a few steps to make it work :)
+Create the .NET Core project with Ocelot in place, then put the configuration as below
+
+```json
+{
+  "ReRoutes": [
+    {
+      "UpstreamPathTemplate": "/say/{name}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/Greet.Greeter/SayHello",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "127.0.0.1",
+          "Port": 5003
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/products",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/ProductCatalog.Product/GetProducts",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "127.0.0.1",
+          "Port": 5002
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/products",
+      "UpstreamHttpMethod": [ "Post" ],
+      "DownstreamPathTemplate": "/ProductCatalog.Product/CreateProduct",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "127.0.0.1",
+          "Port": 5002
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/weather",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/weatherforecast",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5001
+        }
+      ]
+    }
+  ],
+  "GlobalConfiguration": {
+  }
+}
+```
+
+Then in code `Program.cs`, you only put a few line
+
+```csharp
+var configuration = new OcelotPipelineConfiguration
+{
+    PreQueryStringBuilderMiddleware = async (ctx, next) =>
+    {
+        await ctx.HandleGrpcRequestAsync(next);
+    }
+};
+
+app.UseOcelot(configuration).Wait();
+```
+
+- Option 2: Use via an aggregation layer
+
+![](assets/overview_option2.png)
 
 We will normally use Ocelot configuration for the transcode process, the main parser and transformation processes are only happening at aggregation service level so that you will easy to upgrade Ocelot in case we need, but not affect to the grpc-json transcode seats in the aggregation service.
 

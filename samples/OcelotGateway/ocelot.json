@@ -7,8 +7,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "aggregator",
-          "Port": 80
+          "Host": "127.0.0.1",
+          "Port": 5003
         }
       ]
     },
@@ -19,8 +19,8 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "aggregator",
-          "Port": 80
+          "Host": "127.0.0.1",
+          "Port": 5002
         }
       ]
     },
@@ -31,8 +31,20 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "aggregator",
-          "Port": 80
+          "Host": "127.0.0.1",
+          "Port": 5002
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/weather",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/weatherforecast",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5001
         }
       ]
     }

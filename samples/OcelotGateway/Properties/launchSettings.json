@@ -1,18 +1,11 @@
 {
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://localhost:5000/",
-      "sslPort": 0
-    }
-  },
   "profiles": {
     "GrpcGateway": {
       "commandName": "Project",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       },
+      "ancmHostingModel": "OutOfProcess",
       "applicationUrl": "http://localhost:5000"
     }
   }
