@@ -1,4 +1,4 @@
-﻿using GrpcJsonTranscoder;
+using GrpcJsonTranscoder;
 using GrpcJsonTranscoder.Grpc;
 using GrpcShared;
 using Microsoft.AspNetCore;
@@ -27,8 +27,8 @@ namespace OcelotGateway
                         .SetBasePath(hostingContext.HostingEnvironment.ContentRootPath)
                         .AddJsonFile("appsettings.json", true, true)
                         .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", true, true)
-                        .AddJsonFile("ocelot.json", false, false)
-                        //.AddJsonFile($"configuration.{hostingContext.HostingEnvironment.EnvironmentName}.json")
+                         .AddJsonFile("ocelot.json")
+                        .AddJsonFile($"ocelot.{hostingContext.HostingEnvironment.EnvironmentName}.json", true, true)
                         .AddEnvironmentVariables();
                 })
                 .ConfigureServices(services =>
