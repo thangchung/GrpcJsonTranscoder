@@ -1,4 +1,4 @@
-﻿namespace GrpcJsonTranscoder.Models
+﻿namespace GrpcJsonTranscoder.Internal
 {
     public class NameAndValue
     {

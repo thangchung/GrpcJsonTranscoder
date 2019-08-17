@@ -1,5 +1,4 @@
-﻿using GrpcJsonTranscoder.Models;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
@@ -9,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace GrpcJsonTranscoder.Internal
+namespace GrpcJsonTranscoder.Internal.Http
 {
     internal static class HttpContextExtensions
     {
