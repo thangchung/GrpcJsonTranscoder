@@ -11,9 +11,14 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "grpc", "grpc", "{F8EBC152-2
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "__", "__", "{896E81EA-7D8B-4554-A3E0-558D01AF7F68}"
 	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
 		.gitignore = .gitignore
+		docker-compose-tests.yml = docker-compose-tests.yml
+		docker-compose.yml = docker-compose.yml
 		LICENSE = LICENSE
+		NuGet.config = NuGet.config
 		README.md = README.md
+		start.sh = start.sh
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrpcShared", "samples\GrpcShared\GrpcShared.csproj", "{C0008786-D13F-4A96-A0EF-C1E8EA1E5F0E}"

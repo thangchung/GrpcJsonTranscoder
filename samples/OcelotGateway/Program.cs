@@ -1,13 +1,12 @@
-﻿using GrpcJsonTranscoder.Models;
+﻿using GrpcJsonTranscoder;
+using GrpcJsonTranscoder.Grpc;
+using GrpcShared;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
-using System;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace OcelotGateway
@@ -26,15 +25,17 @@ namespace OcelotGateway
                 {
                     config
                         .SetBasePath(hostingContext.HostingEnvironment.ContentRootPath)
-                        .AddJsonFile("appsettings.json")
+                        .AddJsonFile("appsettings.json", true, true)
                         .AddJsonFile($"appsettings.{hostingContext.HostingEnvironment.EnvironmentName}.json", true, true)
-                        .AddJsonFile("ocelot.json")
+                         .AddJsonFile("ocelot.json")
                         .AddJsonFile($"ocelot.{hostingContext.HostingEnvironment.EnvironmentName}.json", true, true)
                         .AddEnvironmentVariables();
                 })
                 .ConfigureServices(services =>
                 {
+                    services.AddGrpcJsonTranscoder(() => new GrpcAssemblyResolver().ConfigGrpcAssembly(typeof(Greeter.GreeterClient).Assembly));
                     services.AddOcelot();
+                    services.AddHttpContextAccessor();
                 })
                 .Configure(app =>
                 {
@@ -42,11 +43,7 @@ namespace OcelotGateway
                     {
                         PreQueryStringBuilderMiddleware = async (ctx, next) =>
                         {
-                            var routes = ctx.TemplatePlaceholderNameAndValues;
-                            ctx.DownstreamRequest.Headers.Add(
-                                "x-grpc-routes",
-                                JsonConvert.SerializeObject(routes.Select(x => new NameAndValue { Name = x.Name, Value = x.Value })));
-                            await next.Invoke();
+                            await ctx.HandleGrpcRequestAsync(next);
                         }
                     };
 
