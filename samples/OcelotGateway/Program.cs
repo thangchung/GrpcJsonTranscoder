@@ -1,4 +1,4 @@
-﻿using GrpcJsonTranscoder;
+using GrpcJsonTranscoder;
 using GrpcJsonTranscoder.Grpc;
 using GrpcShared;
 using Microsoft.AspNetCore;
