@@ -1,6 +1,7 @@
 ﻿using Grpc.Core;
 using GrpcJsonTranscoder.Grpc;
 using GrpcJsonTranscoder.Internal.Grpc;
+using GrpcJsonTranscoder.Internal.Http;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
