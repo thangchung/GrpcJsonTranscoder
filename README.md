@@ -17,6 +17,8 @@ Check out my [blog](https://medium.com/@thangchung) or say hi on [Twitter](https
 
 ## How to run it!
 
+![](assets/GrpcJsonTranscoder.gif)
+
 
 ```bash
 $ docker-compose up
