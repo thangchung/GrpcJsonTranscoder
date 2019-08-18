@@ -9,13 +9,14 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Remove="greet.proto" />
     <None Remove="product_catalog.proto" />
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Google.Api.Gax.Grpc" Version="2.10.0-beta02" />
-    <PackageReference Include="Google.Protobuf" Version="3.8.0" />
-    <PackageReference Include="Grpc.Tools" Version="1.21.0" PrivateAssets="All" />
+    <PackageReference Include="Google.Protobuf" Version="3.9.1" />
+    <PackageReference Include="Grpc.Core" Version="1.22.0" />
+    <PackageReference Include="Grpc.Tools" Version="1.22.0" PrivateAssets="All" />
   </ItemGroup>
 
 </Project>

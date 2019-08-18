@@ -11,32 +11,29 @@ services:
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
     depends_on:
-      - aggregator
-      - cataloggrpc
-      - greetgrpc
+      - weatherserver
+      - productserver
+      - greetserver
     networks:
       - mynetwork
 
-  aggregator:
-    image: aggregator
+  weatherserver:
+    image: weatherserver
     build:
       context: .
-      dockerfile: ./samples/AggregationRestApi/Dockerfile
+      dockerfile: ./samples/WeatherServer/Dockerfile
     ports:
       - "5001:80"
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
-    depends_on:
-      - cataloggrpc
-      - greetgrpc
     networks:
       - mynetwork
 
-  cataloggrpc:
-    image: cataloggrpc
+  productserver:
+    image: productserver
     build:
       context: .
-      dockerfile: ./samples/ProductCatalogGrpcServer/Dockerfile
+      dockerfile: ./samples/ProductGrpcServer/Dockerfile
     ports:
       - "5002:80"
     environment:
@@ -44,8 +41,8 @@ services:
     networks:
       - mynetwork
 
-  greetgrpc:
-    image: greetgrpc
+  greetserver:
+    image: greetserver
     build:
       context: .
       dockerfile: ./samples/GreatGrpcServer/Dockerfile

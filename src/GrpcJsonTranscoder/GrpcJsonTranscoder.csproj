@@ -19,7 +19,7 @@
   <ItemGroup>
     <PackageReference Include="Ocelot" Version="13.5.2" />
     <PackageReference Include="Grpc.Reflection" Version="1.22.0" />
-    <PackageReference Include="Google.Protobuf" Version="3.8.0" />
+    <PackageReference Include="Google.Protobuf" Version="3.9.1" />
     <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.2.2" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Http.Extensions" Version="2.2.0" />

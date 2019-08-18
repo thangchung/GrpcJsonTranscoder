@@ -4,9 +4,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using ProductCatalogGrpcServer.Services;
+using ProductGrpcServer.Services;
 
-namespace ProductCatalogGrpcServer
+namespace ProductGrpcServer
 {
     public class Startup
     {

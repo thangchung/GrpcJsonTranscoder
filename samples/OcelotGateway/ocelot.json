@@ -7,7 +7,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "greetgrpc",
+          "Host": "greetserver",
           "Port": 80
         }
       ]
@@ -19,7 +19,7 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "cataloggrpc",
+          "Host": "productserver",
           "Port": 80
         }
       ]
@@ -31,10 +31,21 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "cataloggrpc",
+          "Host": "productserver",
           "Port": 80
         }
       ]
+    },
+    {
+      "DownstreamPathTemplate": "/todos",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "jsonplaceholder.typicode.com",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/todos"
     },
     {
       "UpstreamPathTemplate": "/weather",
@@ -43,12 +54,37 @@
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {
-          "Host": "aggregator",
+          "Host": "weatherserver",
+          "Port": 80
+        }
+      ],
+
+      "RateLimitOptions": {
+        "ClientWhitelist": [],
+        "EnableRateLimiting": true,
+        "Period": "1s",
+        "PeriodTimespan": 1,
+        "Limit": 1
+      }
+    },
+    {
+      "UpstreamPathTemplate": "/weatherwitherror",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/weatherforecast/error",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "weatherserver",
           "Port": 80
         }
       ]
     }
   ],
   "GlobalConfiguration": {
+    "RateLimitOptions": {
+      "DisableRateLimitHeaders": false,
+      "QuotaExceededMessage": "Hey, you request too many times, slow down!!!",
+      "HttpStatusCode": 999
+    }
   }
 }

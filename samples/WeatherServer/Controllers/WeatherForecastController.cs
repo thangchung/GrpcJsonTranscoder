@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 
-namespace AggregationRestApi.Controllers
+namespace WeatherServer.Controllers
 {
     [ApiController]
     [Route("[controller]")]
@@ -35,23 +36,11 @@ namespace AggregationRestApi.Controllers
             .ToArray();
         }
 
-        [HttpPost]
-        public IEnumerable<WeatherForecast> Post([FromBody] DataDto dto)
+        [HttpGet("error")]
+        public string GetError()
         {
-            var sample = dto.Data;
-            var rng = new Random();
-            return Enumerable.Range(1, 5).Select(index => new WeatherForecast
-            {
-                Date = DateTime.Now.AddDays(index),
-                TemperatureC = rng.Next(-20, 55),
-                Summary = Summaries[rng.Next(Summaries.Length)]
-            })
-            .ToArray();
-        }
-
-        public class DataDto
-        {
-            public string Data { get; set; }
+            throw new Exception("Hey, I throw this");
+            return "Never touch this point...";
         }
     }
 }

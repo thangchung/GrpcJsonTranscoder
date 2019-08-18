@@ -5,7 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace ProductCatalogGrpcServer.Services
+namespace ProductGrpcServer.Services
 {
     public class ProductService : Product.ProductBase
     {

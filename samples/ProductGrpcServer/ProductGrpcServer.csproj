@@ -2,14 +2,11 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.0</TargetFramework>
-    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
-    <DockerfileContext>..\..</DockerfileContext>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="Grpc.AspNetCore" Version="0.1.22-pre2" />
     <PackageReference Include="Grpc.AspNetCore.Server" Version="0.1.22-pre2" />
-    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.7.12" />
   </ItemGroup>
 
   <ItemGroup>

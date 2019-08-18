@@ -37,9 +37,32 @@
       ]
     },
     {
+      "DownstreamPathTemplate": "/todos",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "jsonplaceholder.typicode.com",
+          "Port": 80
+        }
+      ],
+      "UpstreamPathTemplate": "/todos"
+    },
+    {
       "UpstreamPathTemplate": "/weather",
       "UpstreamHttpMethod": [ "Get" ],
       "DownstreamPathTemplate": "/weatherforecast",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5001
+        }
+      ]
+    },
+    {
+      "UpstreamPathTemplate": "/weatherwitherror",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/weatherforecast/error",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
         {

@@ -1,7 +1,8 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using System;
 
-namespace AggregationRestApi
+namespace ProductGrpcServer
 {
     public class Program
     {
@@ -14,6 +15,7 @@ namespace AggregationRestApi
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
+                    
                     webBuilder.UseStartup<Startup>();
                 });
     }
