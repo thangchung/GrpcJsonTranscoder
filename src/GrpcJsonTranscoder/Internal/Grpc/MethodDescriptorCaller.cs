@@ -3,6 +3,7 @@ using Google.Protobuf.Reflection;
 using Grpc.Core;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -49,6 +50,7 @@ namespace GrpcJsonTranscoder.Internal.Grpc
             return task;
         }
 
+        [DebuggerStepThrough]
         private Task<object> CallGrpcAsyncCore<TRequest, TResponse>(MethodDescriptor method, IDictionary<string, string> headers, IEnumerable<TRequest> requests) 
             where TRequest : class, IMessage<TRequest>, new()
             where TResponse : class, IMessage<TResponse>, new()

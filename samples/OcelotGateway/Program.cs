@@ -43,7 +43,8 @@ namespace OcelotGateway
                     {
                         PreQueryStringBuilderMiddleware = async (ctx, next) =>
                         {
-                            await ctx.HandleGrpcRequestAsync(next);
+                            // https://stackoverflow.com/questions/54960613/how-to-create-callcredentials-from-sslcredentials-and-token-string
+                            await ctx.HandleGrpcRequestAsync(next/*, new SslCredentials(File.ReadAllText("Certs/server.crt"))*/);
                         }
                     };
 

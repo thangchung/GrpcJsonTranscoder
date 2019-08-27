@@ -4,6 +4,7 @@ using GrpcJsonTranscoder.Internal.Grpc;
 using GrpcJsonTranscoder.Internal.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
+using Ocelot.LoadBalancer.LoadBalancers;
 using Ocelot.Middleware;
 using Ocelot.Responses;
 using System;
@@ -17,7 +18,7 @@ namespace GrpcJsonTranscoder
 {
     public static class DownStreamContextExtensions
     {
-        public static async Task HandleGrpcRequestAsync(this DownstreamContext context, Func<Task> next)
+        public static async Task HandleGrpcRequestAsync(this DownstreamContext context, Func<Task> next, SslCredentials secureCredentials = null)
         {
             // ignore if the request is not a gRPC content type
             if (!context.HttpContext.Request.Headers.Any(h => h.Key.ToLowerInvariant() == "content-type" && h.Value == "application/grpc"))
@@ -51,12 +52,14 @@ namespace GrpcJsonTranscoder
                         requestData = context.HttpContext.ParseOtherJsonRequest(upstreamHeaders);
                     }
 
-                    // todo: only get the first one, currently we use service mesh to LB the downstream gRPC services
-                    // but we open to support it with manually LB such as Consult 
-                    var downstreamAddress = context.DownstreamReRoute.DownstreamAddresses.FirstOrDefault();
-                    var downstreamHost = $"{downstreamAddress.Host}:{downstreamAddress.Port}";
+                    var loadBalancerFactory = context.HttpContext.RequestServices.GetService<ILoadBalancerFactory>();
+                    var loadBalancerResponse = await loadBalancerFactory.Get(context.DownstreamReRoute, context.Configuration.ServiceProviderConfiguration);
+                    var serviceHostPort = await loadBalancerResponse.Data.Lease(context);
 
-                    var channel = new Channel(downstreamHost, ChannelCredentials.Insecure); //todo: handle TLS with certs later
+                    var downstreamAddress = context.DownstreamReRoute.DownstreamAddresses.FirstOrDefault();
+                    var downstreamHost = $"{serviceHostPort.Data.DownstreamHost}:{serviceHostPort.Data.DownstreamPort}";
+
+                    var channel = new Channel(downstreamHost, secureCredentials ?? ChannelCredentials.Insecure);
                     var client = new MethodDescriptorCaller(channel);
 
                     var requestObject = JsonConvert.DeserializeObject(requestData, methodDescriptor.InputType.ClrType);

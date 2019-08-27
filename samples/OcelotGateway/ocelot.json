@@ -34,7 +34,10 @@
           "Host": "productserver",
           "Port": 80
         }
-      ]
+      ],
+      "LoadBalancerOptions": {
+        "Type": "LeastConnection"
+      }
     },
     {
       "DownstreamPathTemplate": "/todos",
