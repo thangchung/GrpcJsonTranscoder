@@ -63,6 +63,25 @@
       }
     },
     {
+      "UpstreamPathTemplate": "/products/{id}",
+      "UpstreamHttpMethod": [ "Delete" ],
+      "DownstreamPathTemplate": "/ProductCatalog.Product/DeleteProduct",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 5002
+        },
+        {
+          "Host": "localhost",
+          "Port": 50022
+        }
+      ],
+      "LoadBalancerOptions": {
+        "Type": "RoundRobin"
+      }
+    },
+    {
       "DownstreamPathTemplate": "/todos",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [

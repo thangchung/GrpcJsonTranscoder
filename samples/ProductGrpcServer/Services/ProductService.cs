@@ -62,5 +62,19 @@ namespace ProductGrpcServer.Services
                 }
             });
         }
+
+        public override async Task<DeleteProductReply> DeleteProduct(DeleteProductRequest request, ServerCallContext context)
+        {
+            return await Task.FromResult(new DeleteProductReply
+            {
+                Product = new ProductDto
+                {
+                    Id = request.Id,
+                    Name = "Deleted Product",
+                    Quantity = new Random().Next(100),
+                    Description = $"Deleted product with ID {request.Id}"
+                }
+            });
+        }
     }
 }

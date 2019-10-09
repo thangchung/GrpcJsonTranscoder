@@ -47,7 +47,8 @@ namespace GrpcJsonTranscoder
                     switch (context.HttpContext.Request.Method.ToLowerInvariant())
                     {
                         case "get":
-                            requestData = context.HttpContext.ParseGetJsonRequest(upstreamHeaders);
+                        case "delete":
+                            requestData = context.HttpContext.ParseGetOrDeleteJsonRequest(upstreamHeaders);
                             break;
                         case "put":
                             requestData = context.HttpContext.ParsePutJsonRequest(upstreamHeaders);

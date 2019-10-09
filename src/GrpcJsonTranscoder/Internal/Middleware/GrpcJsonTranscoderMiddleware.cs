@@ -33,7 +33,8 @@ namespace GrpcJsonTranscoder.Internal.Middleware
                     switch (context.Request.Method.ToLowerInvariant())
                     {
                         case "get":
-                            requestData = context.ParseGetJsonRequestOnAggregateService();
+                        case "delete":
+                            requestData = context.ParseGetOrDeleteJsonRequestOnAggregateService();
                             break;
                         case "put":
                             requestData = await context.ParsePutJsonRequestOnAggregateService();

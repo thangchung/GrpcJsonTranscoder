@@ -8,6 +8,7 @@ service Product {
   rpc GetProducts (GetProductsRequest) returns (GetProductsReply) {}
   rpc CreateProduct (CreateProductRequest) returns (CreateProductReply) {}
   rpc UpdateProduct (UpdateProductRequest) returns (UpdateProductReply) {}
+  rpc DeleteProduct (DeleteProductRequest) returns (DeleteProductReply) {}
 }
 
 message GetProductsRequest {
@@ -35,6 +36,14 @@ message UpdateProductRequest {
 }
 
 message UpdateProductReply {
+  ProductDto product = 1;
+}
+
+message DeleteProductRequest {
+  int32 id = 1;
+}
+
+message DeleteProductReply {
   ProductDto product = 1;
 }
 

@@ -12,7 +12,7 @@ namespace GrpcJsonTranscoder.Internal.Http
 {
     internal static class HttpContextExtensions
     {
-        public static string ParseGetJsonRequest(this HttpContext context, IDictionary<string, string> upstreamHeaders = null)
+        public static string ParseGetOrDeleteJsonRequest(this HttpContext context, IDictionary<string, string> upstreamHeaders = null)
         {
             var o = new JObject();
 
@@ -75,7 +75,7 @@ namespace GrpcJsonTranscoder.Internal.Http
             return JsonConvert.SerializeObject(o);
         }
 
-        public static string ParseGetJsonRequestOnAggregateService(this HttpContext context)
+        public static string ParseGetOrDeleteJsonRequestOnAggregateService(this HttpContext context)
         {
             var o = new JObject();
 
