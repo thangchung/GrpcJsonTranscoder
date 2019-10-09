@@ -30,13 +30,17 @@ namespace GrpcJsonTranscoder.Internal.Middleware
                 else
                 {
                     string requestData;
-                    if (context.Request.Method.ToLowerInvariant() == "get")
+                    switch (context.Request.Method.ToLowerInvariant())
                     {
-                        requestData = context.ParseGetJsonRequestOnAggregateService();
-                    }
-                    else
-                    {
-                        requestData = await context.ParseOtherJsonRequestOnAggregateService();
+                        case "get":
+                            requestData = context.ParseGetJsonRequestOnAggregateService();
+                            break;
+                        case "put":
+                            requestData = await context.ParsePutJsonRequestOnAggregateService();
+                            break;
+                        default:
+                            requestData = await context.ParseOtherJsonRequestOnAggregateService();
+                            break;
                     }
 
                     var grpcLookupTable = options.Value.GrpcMappers;

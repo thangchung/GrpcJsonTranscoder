@@ -7,6 +7,7 @@ package ProductCatalog;
 service Product {
   rpc GetProducts (GetProductsRequest) returns (GetProductsReply) {}
   rpc CreateProduct (CreateProductRequest) returns (CreateProductReply) {}
+  rpc UpdateProduct (UpdateProductRequest) returns (UpdateProductReply) {}
 }
 
 message GetProductsRequest {
@@ -23,6 +24,17 @@ message CreateProductRequest {
 }
 
 message CreateProductReply {
+  ProductDto product = 1;
+}
+
+message UpdateProductRequest {
+  int32 id = 1;
+  string name = 2;
+  int32 quantity = 3;
+  string description = 4;
+}
+
+message UpdateProductReply {
   ProductDto product = 1;
 }
 

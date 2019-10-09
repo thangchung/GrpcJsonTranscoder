@@ -47,6 +47,34 @@ namespace GrpcJsonTranscoder.Internal.Http
             return json == string.Empty ? "{}" : json;
         }
 
+        public static string ParsePutJsonRequest(this HttpContext context, IDictionary<string, string> upstreamHeaders)
+        {
+            JObject o = new JObject();
+
+            if (upstreamHeaders != null && upstreamHeaders.ContainsKey("x-grpc-body-data"))
+            {
+                o = JObject.Parse(upstreamHeaders["x-grpc-body-data"]);
+            }
+
+            if (upstreamHeaders != null && upstreamHeaders.ContainsKey("x-grpc-route-data"))
+            {
+                // route data
+                var nameValues = JsonConvert.DeserializeObject<List<NameAndValue>>(upstreamHeaders["x-grpc-route-data"]); // work with ocelot
+                foreach (var nameValue in nameValues)
+                {
+                    o.Add(nameValue.Name.Replace("{", "").Replace("}", ""), nameValue.Value);
+                }
+            }
+
+            // query string
+            foreach (var q in context.Request.Query)
+            {
+                o.Add(q.Key, q.Value.ToString());
+            }
+
+            return JsonConvert.SerializeObject(o);
+        }
+
         public static string ParseGetJsonRequestOnAggregateService(this HttpContext context)
         {
             var o = new JObject();
@@ -77,6 +105,32 @@ namespace GrpcJsonTranscoder.Internal.Http
             var stream = new StreamReader(context.Request.Body, encoding);
             var json = await stream.ReadToEndAsync();
             return json == string.Empty ? "{}" : json;
+        }
+
+        public static async Task<string> ParsePutJsonRequestOnAggregateService(this HttpContext context)
+        {
+            var encoding = context.Request.GetTypedHeaders().ContentType?.Encoding ?? Encoding.UTF8;
+            var stream = new StreamReader(context.Request.Body, encoding);
+            var json = await stream.ReadToEndAsync();
+
+            var o = json == string.Empty ? new JObject() : JObject.Parse(json);
+            if (context.Request.Headers.ContainsKey("x-grpc-route-data"))
+            {
+                // route data
+                var nameValues = JsonConvert.DeserializeObject<List<NameAndValue>>(context.Request.Headers["x-grpc-route-data"]); // work with ocelot
+                foreach (var nameValue in nameValues)
+                {
+                    o.Add(nameValue.Name.Replace("{", "").Replace("}", ""), nameValue.Value);
+                }
+            }
+
+            // query string
+            foreach (var q in context.Request.Query)
+            {
+                o.Add(q.Key, q.Value.ToString());
+            }
+
+            return JsonConvert.SerializeObject(o);
         }
 
         public static IDictionary<string, string> GetRequestHeaders(this HttpContext context)

@@ -48,5 +48,19 @@ namespace ProductGrpcServer.Services
                 }
             });
         }
+
+        public override async Task<UpdateProductReply> UpdateProduct(UpdateProductRequest request, ServerCallContext context)
+        {
+            return await Task.FromResult(new UpdateProductReply
+            {
+                Product = new ProductDto
+                {
+                    Id = request.Id,
+                    Name = $"{request.Name} updated",
+                    Quantity = request.Quantity,
+                    Description = $"{request.Description} updated"
+                }
+            });
+        }
     }
 }

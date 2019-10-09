@@ -43,13 +43,18 @@ namespace GrpcJsonTranscoder
                                 { "x-grpc-route-data", JsonConvert.SerializeObject(context.TemplatePlaceholderNameAndValues.Select(x => new {x.Name, x.Value})) },
                                 { "x-grpc-body-data", await context.DownstreamRequest.Content.ReadAsStringAsync() }
                             };
-                    if (context.HttpContext.Request.Method.ToLowerInvariant() == "get")
+
+                    switch (context.HttpContext.Request.Method.ToLowerInvariant())
                     {
-                        requestData = context.HttpContext.ParseGetJsonRequest(upstreamHeaders);
-                    }
-                    else
-                    {
-                        requestData = context.HttpContext.ParseOtherJsonRequest(upstreamHeaders);
+                        case "get":
+                            requestData = context.HttpContext.ParseGetJsonRequest(upstreamHeaders);
+                            break;
+                        case "put":
+                            requestData = context.HttpContext.ParsePutJsonRequest(upstreamHeaders);
+                            break;
+                        default:
+                            requestData = context.HttpContext.ParseOtherJsonRequest(upstreamHeaders);
+                            break;
                     }
 
                     var loadBalancerFactory = context.HttpContext.RequestServices.GetService<ILoadBalancerFactory>();

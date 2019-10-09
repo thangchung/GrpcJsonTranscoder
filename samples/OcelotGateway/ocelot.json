@@ -40,6 +40,21 @@
       }
     },
     {
+      "UpstreamPathTemplate": "/products/{id}",
+      "UpstreamHttpMethod": [ "Put" ],
+      "DownstreamPathTemplate": "/ProductCatalog.Product/UpdateProduct",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "productserver",
+          "Port": 80
+        }
+      ],
+      "LoadBalancerOptions": {
+        "Type": "LeastConnection"
+      }
+    },
+    {
       "DownstreamPathTemplate": "/todos",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
