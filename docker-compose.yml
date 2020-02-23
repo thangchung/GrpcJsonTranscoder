@@ -35,7 +35,8 @@ services:
       context: .
       dockerfile: ./samples/ProductGrpcServer/Dockerfile
     ports:
-      - "5002:80"
+      - "5002:5002"
+      - "50022:50022"
     environment:
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
     networks:

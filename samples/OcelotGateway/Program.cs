@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Ocelot.DependencyInjection;
 using Ocelot.Middleware;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Logging;
 
 namespace OcelotGateway
 {
@@ -33,7 +34,10 @@ namespace OcelotGateway
                 })
                 .ConfigureServices(services =>
                 {
-                    services.AddGrpcJsonTranscoder(() => new GrpcAssemblyResolver().ConfigGrpcAssembly(typeof(Greeter.GreeterClient).Assembly));
+                    services.AddGrpcJsonTranscoder(() => 
+                        new GrpcAssemblyResolver().ConfigGrpcAssembly(
+                            services.BuildServiceProvider().GetService<ILogger<GrpcAssemblyResolver>>(),
+                            typeof(Greeter.GreeterClient).Assembly));
                     services.AddOcelot();
                     services.AddHttpContextAccessor();
                 })

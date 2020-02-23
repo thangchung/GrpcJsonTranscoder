@@ -1,24 +1,27 @@
-﻿using Grpc.Core;
-using GrpcJsonTranscoder.Grpc;
-using GrpcJsonTranscoder.Internal.Grpc;
-using GrpcJsonTranscoder.Internal.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using Ocelot.LoadBalancer.LoadBalancers;
-using Ocelot.Middleware;
-using Ocelot.Responses;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using Grpc.Core;
+using Grpc.Core.Interceptors;
+using GrpcJsonTranscoder.Grpc;
+using GrpcJsonTranscoder.Internal.Grpc;
+using GrpcJsonTranscoder.Internal.Http;
+using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using Ocelot.LoadBalancer.LoadBalancers;
+using Ocelot.Logging;
+using Ocelot.Middleware;
+using Ocelot.Responses;
 
 namespace GrpcJsonTranscoder
 {
     public static class DownStreamContextExtensions
     {
-        public static async Task HandleGrpcRequestAsync(this DownstreamContext context, Func<Task> next, SslCredentials secureCredentials = null)
+        public static async Task HandleGrpcRequestAsync(this DownstreamContext context, Func<Task> next, IEnumerable<Interceptor> interceptors = null, SslCredentials secureCredentials = null)
         {
             // ignore if the request is not a gRPC content type
             if (!context.HttpContext.Request.Headers.Any(h => h.Key.ToLowerInvariant() == "content-type" && h.Value == "application/grpc"))
@@ -37,34 +40,51 @@ namespace GrpcJsonTranscoder
                 }
                 else
                 {
-                    string requestData;
+                    var logger = context.HttpContext.RequestServices.GetService<IOcelotLoggerFactory>().CreateLogger<GrpcAssemblyResolver>();
                     var upstreamHeaders = new Dictionary<string, string>
                             {
                                 { "x-grpc-route-data", JsonConvert.SerializeObject(context.TemplatePlaceholderNameAndValues.Select(x => new {x.Name, x.Value})) },
                                 { "x-grpc-body-data", await context.DownstreamRequest.Content.ReadAsStringAsync() }
                             };
-                    if (context.HttpContext.Request.Method.ToLowerInvariant() == "get")
-                    {
-                        requestData = context.HttpContext.ParseGetJsonRequest(upstreamHeaders);
-                    }
-                    else
-                    {
-                        requestData = context.HttpContext.ParseOtherJsonRequest(upstreamHeaders);
-                    }
+
+                    logger.LogInformation($"Upstream request method is {context.HttpContext.Request.Method}");
+                    logger.LogInformation($"Upstream header data for x-grpc-route-data is {upstreamHeaders["x-grpc-route-data"]}");
+                    logger.LogInformation($"Upstream header data for x-grpc-body-data is {upstreamHeaders["x-grpc-body-data"]}");
+                    var requestObject = context.HttpContext.ParseRequestData(upstreamHeaders);
+                    var requestJsonData = JsonConvert.SerializeObject(requestObject);
+                    logger.LogInformation($"Request object data is {requestJsonData}");
 
                     var loadBalancerFactory = context.HttpContext.RequestServices.GetService<ILoadBalancerFactory>();
                     var loadBalancerResponse = await loadBalancerFactory.Get(context.DownstreamReRoute, context.Configuration.ServiceProviderConfiguration);
                     var serviceHostPort = await loadBalancerResponse.Data.Lease(context);
 
-                    var downstreamAddress = context.DownstreamReRoute.DownstreamAddresses.FirstOrDefault();
                     var downstreamHost = $"{serviceHostPort.Data.DownstreamHost}:{serviceHostPort.Data.DownstreamPort}";
+                    logger.LogInformation($"Downstream IP Address is {downstreamHost}");
 
                     var channel = new Channel(downstreamHost, secureCredentials ?? ChannelCredentials.Insecure);
-                    var client = new MethodDescriptorCaller(channel);
 
-                    var requestObject = JsonConvert.DeserializeObject(requestData, methodDescriptor.InputType.ClrType);
-                    var result = await client.InvokeAsync(methodDescriptor, context.HttpContext.GetRequestHeaders(), requestObject);
-                    var response = new OkResponse<GrpcHttpContent>(new GrpcHttpContent(JsonConvert.SerializeObject(result)));
+                    MethodDescriptorCaller client;
+                    if (interceptors != null && interceptors.Any())
+                    {
+                        CallInvoker callInvoker = null;
+                        foreach (var interceptor in interceptors)
+                        {
+                            callInvoker = channel.Intercept(interceptor);
+                        }
+                        client = new MethodDescriptorCaller(callInvoker);
+                    }
+                    else
+                    {
+                        client = new MethodDescriptorCaller(channel);
+                    }
+                    
+                    var concreteObject = JsonConvert.DeserializeObject(requestJsonData, methodDescriptor.InputType.ClrType);
+                    var result = await client.InvokeAsync(methodDescriptor, context.HttpContext.GetRequestHeaders(), concreteObject);
+                    logger.LogDebug($"gRPC response called with {JsonConvert.SerializeObject(result)}");
+
+                    var jsonSerializer = new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() };
+                    var response = new OkResponse<GrpcHttpContent>(new GrpcHttpContent(JsonConvert.SerializeObject(result, jsonSerializer)));
+
                     var httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
                     {
                         Content = response.Data

@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
-using System;
+using System.Net;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
 
 namespace ProductGrpcServer
 {
@@ -15,7 +16,16 @@ namespace ProductGrpcServer
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    
+                    webBuilder.ConfigureKestrel((ctx, options) =>
+                    {
+                        options.Limits.MinRequestBodyDataRate = null;
+                        options.Listen(IPAddress.Any, 5002);
+                        options.Listen(IPAddress.Any, 50022, listenOptions =>
+                        {
+                            listenOptions.Protocols = HttpProtocols.Http2;
+                        });
+                    });
+
                     webBuilder.UseStartup<Startup>();
                 });
     }

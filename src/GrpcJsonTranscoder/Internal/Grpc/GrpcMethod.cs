@@ -1,46 +1,49 @@
-﻿using Google.Protobuf;
-using Google.Protobuf.Reflection;
-using Grpc.Core;
 using System;
 using System.Collections.Concurrent;
+using Google.Protobuf;
+using Google.Protobuf.Reflection;
+using Grpc.Core;
 
 namespace GrpcJsonTranscoder.Internal.Grpc
 {
-    internal class GrpcMethod<TRequest, KResult> 
+    internal class GrpcMethod<TRequest, TResponse> 
         where TRequest : class, IMessage<TRequest>, new()
-        where KResult : class, IMessage<KResult>, new()
+        where TResponse : class, IMessage<TResponse>, new()
     {
-        private static ConcurrentDictionary<MethodDescriptor, Method<TRequest, KResult>> _methods
-            = new ConcurrentDictionary<MethodDescriptor, Method<TRequest, KResult>>();
+        private static readonly ConcurrentDictionary<MethodDescriptor, Method<TRequest, TResponse>> _methods
+            = new ConcurrentDictionary<MethodDescriptor, Method<TRequest, TResponse>>();
 
-        public static Method<TRequest, KResult> GetMethod(MethodDescriptor methodDescriptor)
+        public static Method<TRequest, TResponse> GetMethod(MethodDescriptor methodDescriptor)
         {
-            if (_methods.TryGetValue(methodDescriptor, out Method<TRequest, KResult> method))
+            if (_methods.TryGetValue(methodDescriptor, out var method))
                 return method;
 
-            int mtype = 0;
-            if (methodDescriptor.IsClientStreaming)
-                mtype = 1;
-            if (methodDescriptor.IsServerStreaming)
-                mtype += 2;
-            var methodType = (MethodType)Enum.ToObject(typeof(MethodType), mtype);
+            var callingMethodType = 0;
 
-            var _method = new Method<TRequest, KResult>(
+            if (methodDescriptor.IsClientStreaming)
+                callingMethodType = 1;
+
+            if (methodDescriptor.IsServerStreaming)
+                callingMethodType += 2;
+
+            var methodType = (MethodType)Enum.ToObject(typeof(MethodType), callingMethodType);
+
+            method = new Method<TRequest, TResponse>(
                 methodType,
                 methodDescriptor.Service.FullName,
                 methodDescriptor.Name,
                 ArgsParser<TRequest>.Marshaller,
-                ArgsParser<KResult>.Marshaller);
+                ArgsParser<TResponse>.Marshaller);
 
-            _methods.TryAdd(methodDescriptor, _method);
+            _methods.TryAdd(methodDescriptor, method);
 
-            return _method;
+            return method;
         }
     }
 
     internal static class ArgsParser<T> where T : class, IMessage<T>, new()
     {
-        public static MessageParser<T> Parser = new MessageParser<T>(() => Factory<T>.CreateInstance());
-        public static Marshaller<T> Marshaller = Marshallers.Create((arg) => MessageExtensions.ToByteArray(arg), Parser.ParseFrom);
+        public static readonly MessageParser<T> Parser = new MessageParser<T>(Factory<T>.CreateInstance);
+        public static readonly Marshaller<T> Marshaller = Marshallers.Create(MessageExtensions.ToByteArray, Parser.ParseFrom);
     }
 }

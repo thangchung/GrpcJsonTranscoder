@@ -1,11 +1,11 @@
-﻿using Google.Protobuf;
-using Google.Protobuf.Reflection;
-using Grpc.Core;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
+using Google.Protobuf;
+using Google.Protobuf.Reflection;
+using Grpc.Core;
 
 namespace GrpcJsonTranscoder.Internal.Grpc
 {
@@ -15,13 +15,11 @@ namespace GrpcJsonTranscoder.Internal.Grpc
         {
         }
 
-        public MethodDescriptorCaller(Channel channel) : base(channel)
-        {
-        }
+        public MethodDescriptorCaller(CallInvoker callInvoker) : base(callInvoker) { }
 
-        protected MethodDescriptorCaller(ClientBaseConfiguration configuration) : base(configuration)
-        {
-        }
+        public MethodDescriptorCaller(ChannelBase channel) : base(channel) { }
+
+        protected MethodDescriptorCaller(ClientBaseConfiguration configuration) : base(configuration) { }
 
         protected override MethodDescriptorCaller NewInstance(ClientBaseConfiguration configuration)
         {
@@ -32,138 +30,123 @@ namespace GrpcJsonTranscoder.Internal.Grpc
         {
             object requests;
 
-            if (requestObject != null && typeof(IEnumerable<>).MakeGenericType(method.InputType.ClrType).IsAssignableFrom(requestObject.GetType()))
+            if (requestObject != null && typeof(IEnumerable<>).MakeGenericType(method.InputType.ClrType).IsInstanceOfType(requestObject))
             {
                 requests = requestObject;
             }
             else
             {
-                Array ary = Array.CreateInstance(method.InputType.ClrType, 1);
-                ary.SetValue(requestObject, 0);
-                requests = ary;
+                var arrayInstance = Array.CreateInstance(method.InputType.ClrType, 1);
+                arrayInstance.SetValue(requestObject, 0);
+                requests = arrayInstance;
             }
 
-            System.Reflection.MethodInfo m = typeof(MethodDescriptorCaller).GetMethod("CallGrpcAsyncCore", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+            var callGrpcAsyncCoreMethod = typeof(MethodDescriptorCaller).GetMethod("CallGrpcAsyncCore", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
 
-            Task<object> task = (Task<object>)m.MakeGenericMethod(new Type[] { method.InputType.ClrType, method.OutputType.ClrType }).Invoke(this, new object[] { method, headers, requests });
+            var task = (Task<object>)callGrpcAsyncCoreMethod?.MakeGenericMethod(new Type[] { method.InputType.ClrType, method.OutputType.ClrType }).Invoke(this, new [] { method, headers, requests });
 
             return task;
         }
 
         [DebuggerStepThrough]
-        private Task<object> CallGrpcAsyncCore<TRequest, TResponse>(MethodDescriptor method, IDictionary<string, string> headers, IEnumerable<TRequest> requests) 
+        private Task<object> CallGrpcAsyncCore<TRequest, TResponse>(MethodDescriptor method, IDictionary<string, string> headers, IEnumerable<TRequest> requests)
             where TRequest : class, IMessage<TRequest>, new()
             where TResponse : class, IMessage<TResponse>, new()
         {
-            CallOptions option = CreateCallOptions(headers);
+            var option = CreateCallOptions(headers);
             var rpc = GrpcMethod<TRequest, TResponse>.GetMethod(method);
             switch (rpc.Type)
             {
                 case MethodType.Unary:
-
-                    Task<TResponse> taskUnary = AsyncUnaryCall(CallInvoker, rpc, option, requests.FirstOrDefault());
-
-                    var s = taskUnary.Result;
+                    var taskUnary = AsyncUnaryCall(CallInvoker, rpc, option, requests.FirstOrDefault());
                     return Task.FromResult<object>(taskUnary.Result);
 
                 case MethodType.ClientStreaming:
-
-                    Task<TResponse> taskClientStreaming = AsyncClientStreamingCall(CallInvoker, rpc, option, requests);
-
+                    var taskClientStreaming = AsyncClientStreamingCall(CallInvoker, rpc, option, requests);
                     return Task.FromResult<object>(taskClientStreaming.Result);
 
                 case MethodType.ServerStreaming:
-
-                    Task<IList<TResponse>> taskServerStreaming = AsyncServerStreamingCall(CallInvoker, rpc, option, requests.FirstOrDefault());
-
+                    var taskServerStreaming = AsyncServerStreamingCall(CallInvoker, rpc, option, requests.FirstOrDefault());
                     return Task.FromResult<object>(taskServerStreaming.Result);
 
                 case MethodType.DuplexStreaming:
-
-                    Task<IList<TResponse>> taskDuplexStreaming = AsyncDuplexStreamingCall(CallInvoker, rpc, option, requests);
-
+                    var taskDuplexStreaming = AsyncDuplexStreamingCall(CallInvoker, rpc, option, requests);
                     return Task.FromResult<object>(taskDuplexStreaming.Result);
 
                 default:
-                    throw new NotSupportedException(string.Format("MethodType '{0}' is not supported.", rpc.Type));
+                    throw new NotSupportedException($"MethodType '{rpc.Type}' is not supported.");
             }
         }
 
-        private CallOptions CreateCallOptions(IDictionary<string, string> headers)
+        private static CallOptions CreateCallOptions(IDictionary<string, string> headers)
         {
-            Metadata meta = new Metadata();
+            var meta = new Metadata();
 
-            foreach (KeyValuePair<string, string> entry in headers)
+            foreach (var (key, value) in headers)
             {
-                meta.Add(entry.Key, entry.Value);
+                meta.Add(key, value);
             }
 
-            CallOptions option = new CallOptions(meta);
+            var option = new CallOptions(meta);
 
             return option;
         }
 
-        private Task<TResponse> AsyncUnaryCall<TRequest, TResponse>(CallInvoker invoker, Method<TRequest, TResponse> method, CallOptions option, TRequest request) where TRequest : class where TResponse : class
+        private static Task<TResponse> AsyncUnaryCall<TRequest, TResponse>(CallInvoker invoker, Method<TRequest, TResponse> method, CallOptions option, TRequest request) where TRequest : class where TResponse : class
         {
             return invoker.AsyncUnaryCall(method, null, option, request).ResponseAsync;
         }
 
-        private async Task<TResponse> AsyncClientStreamingCall<TRequest, TResponse>(CallInvoker invoker, Method<TRequest, TResponse> method, CallOptions option, IEnumerable<TRequest> requests) where TRequest : class where TResponse : class
+        private static async Task<TResponse> AsyncClientStreamingCall<TRequest, TResponse>(CallInvoker invoker, Method<TRequest, TResponse> method, CallOptions option, IEnumerable<TRequest> requests) where TRequest : class where TResponse : class
         {
-            using (AsyncClientStreamingCall<TRequest, TResponse> call = invoker.AsyncClientStreamingCall(method, null, option))
+            using var call = invoker.AsyncClientStreamingCall(method, null, option);
+            if (requests != null)
             {
-                if (requests != null)
+                foreach (var request in requests)
                 {
-                    foreach (TRequest request in requests)
-                    {
-                        await call.RequestStream.WriteAsync(request).ConfigureAwait(false);
-                    }
+                    await call.RequestStream.WriteAsync(request).ConfigureAwait(false);
                 }
-
-                await call.RequestStream.CompleteAsync().ConfigureAwait(false);
-
-                return call.ResponseAsync.Result;
             }
+
+            await call.RequestStream.CompleteAsync().ConfigureAwait(false);
+
+            return call.ResponseAsync.Result;
         }
 
-        private async Task<IList<TResponse>> AsyncServerStreamingCall<TRequest, TResponse>(CallInvoker invoker, Method<TRequest, TResponse> method, CallOptions option, TRequest request) where TRequest : class where TResponse : class
+        private static async Task<IList<TResponse>> AsyncServerStreamingCall<TRequest, TResponse>(CallInvoker invoker, Method<TRequest, TResponse> method, CallOptions option, TRequest request) where TRequest : class where TResponse : class
         {
-            using (AsyncServerStreamingCall<TResponse> call = invoker.AsyncServerStreamingCall(method, null, option, request))
+            using var call = invoker.AsyncServerStreamingCall(method, null, option, request);
+            var responses = new List<TResponse>();
+
+            while (await call.ResponseStream.MoveNext().ConfigureAwait(false))
             {
-                List<TResponse> responses = new List<TResponse>();
-
-                while (await call.ResponseStream.MoveNext().ConfigureAwait(false))
-                {
-                    responses.Add(call.ResponseStream.Current);
-                }
-
-                return responses;
+                responses.Add(call.ResponseStream.Current);
             }
+
+            return responses;
         }
 
-        private async Task<IList<TResponse>> AsyncDuplexStreamingCall<TRequest, TResponse>(CallInvoker invoker, Method<TRequest, TResponse> method, CallOptions option, IEnumerable<TRequest> requests) where TRequest : class where TResponse : class
+        private static async Task<IList<TResponse>> AsyncDuplexStreamingCall<TRequest, TResponse>(CallInvoker invoker, Method<TRequest, TResponse> method, CallOptions option, IEnumerable<TRequest> requests) where TRequest : class where TResponse : class
         {
-            using (AsyncDuplexStreamingCall<TRequest, TResponse> call = invoker.AsyncDuplexStreamingCall(method, null, option))
+            using var call = invoker.AsyncDuplexStreamingCall(method, null, option);
+            if (requests != null)
             {
-                if (requests != null)
+                foreach (var request in requests)
                 {
-                    foreach (TRequest request in requests)
-                    {
-                        await call.RequestStream.WriteAsync(request).ConfigureAwait(false);
-                    }
+                    await call.RequestStream.WriteAsync(request).ConfigureAwait(false);
                 }
-
-                await call.RequestStream.CompleteAsync().ConfigureAwait(false);
-
-                List<TResponse> responses = new List<TResponse>();
-
-                while (await call.ResponseStream.MoveNext().ConfigureAwait(false))
-                {
-                    responses.Add(call.ResponseStream.Current);
-                }
-
-                return responses;
             }
+
+            await call.RequestStream.CompleteAsync().ConfigureAwait(false);
+
+            var responses = new List<TResponse>();
+
+            while (await call.ResponseStream.MoveNext().ConfigureAwait(false))
+            {
+                responses.Add(call.ResponseStream.Current);
+            }
+
+            return responses;
         }
     }
 }
