@@ -55,7 +55,7 @@ namespace GrpcJsonTranscoder
                     logger.LogInformation($"Request object data is {requestJsonData}");
 
                     var loadBalancerFactory = context.HttpContext.RequestServices.GetService<ILoadBalancerFactory>();
-                    var loadBalancerResponse = await loadBalancerFactory.Get(context.DownstreamReRoute, context.Configuration.ServiceProviderConfiguration);
+                    var loadBalancerResponse =  loadBalancerFactory.Get(context.DownstreamReRoute, context.Configuration.ServiceProviderConfiguration);
                     var serviceHostPort = await loadBalancerResponse.Data.Lease(context);
 
                     var downstreamHost = $"{serviceHostPort.Data.DownstreamHost}:{serviceHostPort.Data.DownstreamPort}";
@@ -77,14 +77,13 @@ namespace GrpcJsonTranscoder
                     {
                         client = new MethodDescriptorCaller(channel);
                     }
-                    
-                    var concreteObject = JsonConvert.DeserializeObject(requestJsonData, methodDescriptor.InputType.ClrType);
+                    var concreteObject = Google.Protobuf.JsonParser.Default.Parse(upstreamHeaders["x-grpc-body-data"], methodDescriptor.InputType);
                     var result = await client.InvokeAsync(methodDescriptor, context.HttpContext.GetRequestHeaders(), concreteObject);
                     logger.LogDebug($"gRPC response called with {JsonConvert.SerializeObject(result)}");
 
                     var jsonSerializer = new JsonSerializerSettings { ContractResolver = new CamelCasePropertyNamesContractResolver() };
                     var response = new OkResponse<GrpcHttpContent>(new GrpcHttpContent(JsonConvert.SerializeObject(result, jsonSerializer)));
-
+                    context.HttpContext.Response.ContentLength = response.Data.ReadAsByteArrayAsync().Result.Length;
                     var httpResponseMessage = new HttpResponseMessage(HttpStatusCode.OK)
                     {
                         Content = response.Data
