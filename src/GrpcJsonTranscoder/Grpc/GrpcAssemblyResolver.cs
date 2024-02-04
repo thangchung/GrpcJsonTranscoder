@@ -66,7 +66,7 @@ namespace GrpcJsonTranscoder.Grpc
                     foreach (var method in svr.Methods)
                     {
                         _logger.LogInformation($"Add method name #{method.Name.ToUpper()} into the assembly resolver.");
-                        methodDescriptorDic.TryAdd(method.Name.ToUpper(), method);
+                        methodDescriptorDic.TryAdd(method.FullName.ToUpper(), method);
                     }
                 }
             }
