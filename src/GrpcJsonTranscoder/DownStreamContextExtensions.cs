@@ -32,7 +32,7 @@ namespace GrpcJsonTranscoder
             {
                 var methodPath = context.DownstreamReRoute.DownstreamPathTemplate.Value;
                 var grpcAssemblyResolver = context.HttpContext.RequestServices.GetService<GrpcAssemblyResolver>();
-                var methodDescriptor = grpcAssemblyResolver.FindMethodDescriptor(methodPath.Split('/').Last().ToUpperInvariant());
+                var methodDescriptor = grpcAssemblyResolver.FindMethodDescriptor(methodPath.TrimStart('/').Replace("/", ".").Last().ToUpperInvariant());
 
                 if (methodDescriptor == null)
                 {
